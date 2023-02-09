@@ -5,7 +5,7 @@ import Image from 'react-uwp/Image';
 import Button from 'react-uwp/Button';
 import PubSub from 'pubsub-js';
 import TopBlur from './TopBlur';
-import Spinner from './spinner';
+import Spinner from './Spinner';
 import Steam from '../utils/Steam';
 
 const SGDB = window.require('steamgriddb');

@@ -4,7 +4,7 @@
 param (
     [Parameter(Mandatory=$True)][string]$launchcmd,    # Command to launch game
     [Parameter(Mandatory=$True)][string]$launcher,     # Launcher to kill
-    [Parameter(Mandatory=$True)][string[]]$game,       # Game(s) to watch
+    [Parameter(Mandatory=$True)][string[]]$game,       # GameList(s) to watch
 
     [Parameter(Mandatory=$False)][bool]$bnet = $False, # Use Battle.net-specific launch method
     [Parameter(Mandatory=$False)][string]$bnetpath,    # Battle.net executable
@@ -26,7 +26,7 @@ function Wait-ProcessChildren($id) {
 Write-Host 'Killing launcher'
 Get-Process $launcher -ErrorAction SilentlyContinue | Stop-Process
 
-# Start Game
+# Start GameList
 If ($bnet) {
     & "$scriptPath\BnetHelper.ps1" -bnet $bnetpath -launchid $bnetlaunchid
 } Else {
@@ -45,12 +45,12 @@ Do {
     If (!($gameProcess)) {
         # Timeout after 30 minutes
 		If ($currentDate.AddMinutes(30) -lt (Get-Date)) {
-			Write-Host 'Game process could not be found'
+			Write-Host 'GameList process could not be found'
 			exit
 		}
         Start-Sleep -Seconds 1
     } Else {
-        Write-Host 'Game started!'
+        Write-Host 'GameList started!'
         $gameStarted = $true
     }
 } Until ($gameStarted)
@@ -61,7 +61,7 @@ Wait-Process -InputObject $gameProcess
 # Wait until child processes close
 Wait-ProcessChildren $gameProcess.Id
 
-Write-Host 'Game closed'
+Write-Host 'GameList closed'
 
 # Wait for cloud saves or whatever
 Start-Sleep -Seconds 5

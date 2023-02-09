@@ -11,11 +11,11 @@ import {
   Link,
   Route,
 } from 'react-router-dom';
-import ToastHandler from './components/toastHandler';
+import ToastHandler from './components/ToastHandler';
 
 import UWPNoise from './images/uwp-noise.png';
 import './styles/App.css';
-import Games from './components/games';
+import GamesList from './components/GamesList';
 import Game from './components/Game';
 import Import from './components/Import';
 import Search from './components/Search';
@@ -85,7 +85,7 @@ class App extends React.Component {
 
     const navigationTopNodes = [
       <SplitViewCommand key="0" label="Library" icon="Library" onClick={() => this.handleNavRedirect('/')} />,
-      <SplitViewCommand key="1" label="Import Games" icon="ImportAll" onClick={() => this.handleNavRedirect('/import')} />,
+      <SplitViewCommand key="1" label="Import GamesList" icon="ImportAll" onClick={() => this.handleNavRedirect('/import')} />,
     ];
 
     let backBtn;
@@ -179,7 +179,7 @@ class App extends React.Component {
               >
                 {redirectTo && <Redirect to={redirectTo} />}
 
-                <Route exact path="/" component={Games} />
+                <Route exact path="/" component={GamesList} />
                 <Route exact path="/import" component={Import} />
                 <Route exact path="/game" component={Game} />
                 <Route exact path="/search" component={Search} />

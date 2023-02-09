@@ -5,7 +5,7 @@ import { Icon } from 'react-uwp';
 import { isEqual } from 'lodash';
 import ImportList from './ImportList';
 import ImportAllButton from './ImportAllButton';
-import Spinner from './spinner';
+import Spinner from './Spinner';
 import Steam from '../utils/Steam';
 import platformModules from '../importers';
 

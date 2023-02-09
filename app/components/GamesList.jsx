@@ -9,7 +9,7 @@ import Fuse from 'fuse.js';
 import PubSub from 'pubsub-js';
 import { debounce } from 'lodash';
 import { forceCheck } from 'react-lazyload';
-import Spinner from './spinner';
+import Spinner from './Spinner';
 import Steam from '../utils/Steam';
 import TopBlur from './TopBlur';
 import GameListItem from './GameListItem';
@@ -17,7 +17,7 @@ import platformModules from '../importers';
 
 const log = window.require('electron-log');
 
-class Games extends React.Component {
+class GamesList extends React.Component {
   constructor(props) {
     super(props);
     this.toGame = this.toGame.bind(this);
@@ -191,5 +191,5 @@ class Games extends React.Component {
   }
 }
 
-Games.contextTypes = { theme: PropTypes.object };
-export default Games;
+GamesList.contextTypes = { theme: PropTypes.object };
+export default GamesList;
