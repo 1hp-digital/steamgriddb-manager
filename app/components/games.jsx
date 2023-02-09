@@ -9,11 +9,11 @@ import Fuse from 'fuse.js';
 import PubSub from 'pubsub-js';
 import { debounce } from 'lodash';
 import { forceCheck } from 'react-lazyload';
-import Spinner from './Components/spinner';
-import Steam from './Steam';
-import TopBlur from './Components/TopBlur';
-import GameListItem from './Components/Games/GameListItem';
-import platformModules from './importers';
+import Spinner from './spinner';
+import Steam from '../js/Steam';
+import TopBlur from './TopBlur';
+import GameListItem from './GameListItem';
+import platformModules from '../js/importers';
 
 const log = window.require('electron-log');
 

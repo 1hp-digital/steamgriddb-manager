@@ -4,9 +4,9 @@ import { Redirect } from 'react-router-dom';
 import Image from 'react-uwp/Image';
 import Button from 'react-uwp/Button';
 import PubSub from 'pubsub-js';
-import TopBlur from './Components/TopBlur';
-import Spinner from './Components/spinner';
-import Steam from './Steam';
+import TopBlur from './TopBlur';
+import Spinner from './spinner';
+import Steam from '../js/Steam';
 
 const SGDB = window.require('steamgriddb');
 

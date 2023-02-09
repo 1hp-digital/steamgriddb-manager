@@ -11,14 +11,14 @@ import {
   Link,
   Route,
 } from 'react-router-dom';
-import ToastHandler from './js/Components/toastHandler';
+import ToastHandler from './components/toastHandler';
 
 import UWPNoise from './images/uwp-noise.png';
 import './styles/App.css';
-import Games from './js/games';
-import Game from './js/Game';
-import Import from './js/Import';
-import Search from './js/Search';
+import Games from './components/games';
+import Game from './components/Game';
+import Import from './components/Import';
+import Search from './components/Search';
 
 import Steam from './js/Steam';
 

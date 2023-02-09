@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import PubSub from 'pubsub-js';
 import { Icon } from 'react-uwp';
 import { isEqual } from 'lodash';
-import ImportList from './Components/Import/ImportList';
-import ImportAllButton from './Components/Import/ImportAllButton';
-import Spinner from './Components/spinner';
-import Steam from './Steam';
-import platformModules from './importers';
+import ImportList from './ImportList';
+import ImportAllButton from './ImportAllButton';
+import Spinner from './spinner';
+import Steam from '../js/Steam';
+import platformModules from '../js/importers';
 
 const Store = window.require('electron-store');
 const SGDB = window.require('steamgriddb');
