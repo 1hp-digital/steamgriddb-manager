@@ -13,7 +13,7 @@ import Spinner from './spinner';
 import Steam from '../js/Steam';
 import TopBlur from './TopBlur';
 import GameListItem from './GameListItem';
-import platformModules from '../js/importers';
+import platformModules from '../importers';
 
 const log = window.require('electron-log');
 

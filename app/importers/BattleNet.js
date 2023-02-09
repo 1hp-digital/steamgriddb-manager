@@ -1,5 +1,5 @@
 import decoder from 'blizzard-product-parser/src/js/database'; // Workaround for badly configured lib
-import { PowerShell, LauncherAutoClose } from '../paths';
+import { PowerShell, LauncherAutoClose } from '../js/paths';
 
 const Registry = window.require('winreg');
 const fs = window.require('fs');

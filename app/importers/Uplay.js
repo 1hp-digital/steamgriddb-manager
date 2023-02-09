@@ -1,4 +1,4 @@
-import { PowerShell, LauncherAutoClose } from '../paths';
+import { PowerShell, LauncherAutoClose } from '../js/paths';
 
 const Registry = window.require('winreg');
 const yaml = window.require('js-yaml');

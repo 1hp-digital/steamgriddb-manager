@@ -7,7 +7,7 @@ import ImportList from './ImportList';
 import ImportAllButton from './ImportAllButton';
 import Spinner from './spinner';
 import Steam from '../js/Steam';
-import platformModules from '../js/importers';
+import platformModules from '../importers';
 
 const Store = window.require('electron-store');
 const SGDB = window.require('steamgriddb');
