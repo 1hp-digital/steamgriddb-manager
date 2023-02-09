@@ -11,16 +11,16 @@ import {
   Link,
   Route,
 } from 'react-router-dom';
-import ToastHandler from './Components/toastHandler';
+import ToastHandler from './js/Components/toastHandler';
 
-import UWPNoise from '../images/uwp-noise.png';
-import '../styles/App.css';
-import Games from './games';
-import Game from './Game';
-import Import from './Import';
-import Search from './Search';
+import UWPNoise from './images/uwp-noise.png';
+import './styles/App.css';
+import Games from './js/games';
+import Game from './js/Game';
+import Import from './js/Import';
+import Search from './js/Search';
 
-import Steam from './Steam';
+import Steam from './js/Steam';
 
 // Using window.require so babel doesn't change the node require
 const electron = window.require('electron');

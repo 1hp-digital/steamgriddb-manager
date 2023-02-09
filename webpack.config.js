@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: './app/js/index.jsx',
+  entry: './app/index.jsx',
   mode: 'development',
   devtool: 'source-map',
   target: 'node',
