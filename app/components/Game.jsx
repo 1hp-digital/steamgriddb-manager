@@ -5,7 +5,7 @@ import Image from 'react-uwp/Image';
 import Button from 'react-uwp/Button';
 import PubSub from 'pubsub-js';
 import TopBlur from './TopBlur';
-import Steam from '../js/Steam';
+import Steam from '../utils/Steam';
 import heroPlaceholder from '../images/hero_none.png';
 import capsuleVerticalPlaceholder from '../images/capsule_vertical_none.png';
 import capsulePlaceholder from '../images/capsule_none.png';

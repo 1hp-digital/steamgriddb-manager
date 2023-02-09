@@ -6,7 +6,7 @@ import Button from 'react-uwp/Button';
 import PubSub from 'pubsub-js';
 import TopBlur from './TopBlur';
 import Spinner from './spinner';
-import Steam from '../js/Steam';
+import Steam from '../utils/Steam';
 
 const SGDB = window.require('steamgriddb');
 

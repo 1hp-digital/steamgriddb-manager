@@ -10,7 +10,7 @@ import PubSub from 'pubsub-js';
 import { debounce } from 'lodash';
 import { forceCheck } from 'react-lazyload';
 import Spinner from './spinner';
-import Steam from '../js/Steam';
+import Steam from '../utils/Steam';
 import TopBlur from './TopBlur';
 import GameListItem from './GameListItem';
 import platformModules from '../importers';

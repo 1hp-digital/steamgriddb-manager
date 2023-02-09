@@ -6,7 +6,7 @@ import { isEqual } from 'lodash';
 import ImportList from './ImportList';
 import ImportAllButton from './ImportAllButton';
 import Spinner from './spinner';
-import Steam from '../js/Steam';
+import Steam from '../utils/Steam';
 import platformModules from '../importers';
 
 const Store = window.require('electron-store');

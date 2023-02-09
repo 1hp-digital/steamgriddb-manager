@@ -20,7 +20,7 @@ import Game from './components/Game';
 import Import from './components/Import';
 import Search from './components/Search';
 
-import Steam from './js/Steam';
+import Steam from './utils/Steam';
 
 // Using window.require so babel doesn't change the node require
 const electron = window.require('electron');
