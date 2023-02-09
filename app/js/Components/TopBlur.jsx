@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import UWPNoise from '../../img/uwp-noise.png';
+import UWPNoise from '../../images/uwp-noise.png';
 
 const TopBlur = ({ additionalHeight }) => (
   <div

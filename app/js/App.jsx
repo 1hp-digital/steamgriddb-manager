@@ -13,8 +13,8 @@ import {
 } from 'react-router-dom';
 import ToastHandler from './Components/toastHandler';
 
-import UWPNoise from '../img/uwp-noise.png';
-import '../css/App.css';
+import UWPNoise from '../images/uwp-noise.png';
+import '../styles/App.css';
 import Games from './games';
 import Game from './Game';
 import Import from './Import';

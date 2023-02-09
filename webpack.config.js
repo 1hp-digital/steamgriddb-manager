@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/js/index.jsx',
+  entry: './app/js/index.jsx',
   mode: 'development',
   devtool: 'source-map',
   target: 'node',
@@ -23,7 +23,7 @@ module.exports = {
           loader: 'file-loader',
           options: {
             outputPath: 'img',
-            publicPath: './img',
+            publicPath: './images',
           },
         },
       },

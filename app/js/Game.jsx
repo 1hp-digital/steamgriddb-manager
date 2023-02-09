@@ -6,10 +6,10 @@ import Button from 'react-uwp/Button';
 import PubSub from 'pubsub-js';
 import TopBlur from './Components/TopBlur';
 import Steam from './Steam';
-import heroPlaceholder from '../img/hero_none.png';
-import capsuleVerticalPlaceholder from '../img/capsule_vertical_none.png';
-import capsulePlaceholder from '../img/capsule_none.png';
-import logoPlaceholder from '../img/logo_none.png';
+import heroPlaceholder from '../images/hero_none.png';
+import capsuleVerticalPlaceholder from '../images/capsule_vertical_none.png';
+import capsulePlaceholder from '../images/capsule_none.png';
+import logoPlaceholder from '../images/logo_none.png';
 
 const { join } = window.require('path');
 const fs = window.require('fs');
