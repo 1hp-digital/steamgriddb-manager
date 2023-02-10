@@ -4,61 +4,45 @@ import Button from "react-uwp/Button";
 import ProgressBar from "react-uwp/ProgressBar";
 import PropTypes from "prop-types";
 
-class ImportListItem extends React.Component {
-    constructor(props) {
-        super(props);
+const ImportListItem = (props) => {
+    const {game, platform, onImportClick, progress, thumb, steamIsRunning} = props;
 
-        const {
-            game,
-            platform,
-        } = this.props;
+    const handleClick = () => {
+        onImportClick(game, platform);
+    };
 
-        this.game = game;
-        this.platform = platform;
-        this.handleClick = this.handleClick.bind(this);
+    let progressBar = <></>;
+    if (progress && progress !== 1) {
+        progressBar = <ProgressBar style={{ display: "block", width: "100%" }} defaultProgressValue={this.game.progress} />;
     }
 
-    handleClick() {
-        const { onImportClick } = this.props;
-        onImportClick(this.game, this.platform);
-    }
-
-    render() {
-        const { progress, thumb, steamIsRunning } = this.props;
-
-        let progressBar = <></>;
-        if (progress && progress !== 1) {
-            progressBar = <ProgressBar style={{ display: "block", width: "100%" }} defaultProgressValue={this.game.progress} />;
-        }
-
-        return (
-            <div
-                style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    width: "inherit",
-                }}
+    return (
+        <div
+            style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                width: "inherit",
+            }}
+        >
+            <Image
+                style={{ marginRight: 10 }}
+                height="30px"
+                width="64px"
+                src={thumb}
+            />
+            {game.name}
+            <Button
+                style={{ opacity: 0, marginLeft: "auto" }}
+                onClick={handleClick}
+                disabled={steamIsRunning}
             >
-                <Image
-                    style={{ marginRight: 10 }}
-                    height="30px"
-                    width="64px"
-                    src={thumb}
-                />
-                {this.game.name}
-                <Button
-                    style={{ opacity: 0, marginLeft: "auto" }}
-                    onClick={this.handleClick}
-                    disabled={steamIsRunning}
-                >
           Import
-                </Button>
-                {progressBar}
-            </div>
-        );
-    }
-}
+            </Button>
+            {progressBar}
+        </div>
+    );
+};
 
 ImportListItem.propTypes = {
     platform: PropTypes.object.isRequired,
