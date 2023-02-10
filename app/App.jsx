@@ -85,7 +85,7 @@ class App extends React.Component {
 
         const navigationTopNodes = [
             <SplitViewCommand key="0" label="Library" icon="Library" onClick={() => this.handleNavRedirect("/")} />,
-            <SplitViewCommand key="1" label="Import GamesList" icon="ImportAll" onClick={() => this.handleNavRedirect("/import")} />,
+            <SplitViewCommand key="1" label="Import Games" icon="ImportAll" onClick={() => this.handleNavRedirect("/import")} />,
         ];
 
         let backBtn;
