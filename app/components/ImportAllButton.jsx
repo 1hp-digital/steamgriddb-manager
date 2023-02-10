@@ -2,36 +2,23 @@ import React from "react";
 import Button from "react-uwp/Button";
 import PropTypes from "prop-types";
 
-class ImportAllButton extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleClick = this.handleClick.bind(this);
-    }
+const ImportAllButton = (props) => {
+    const {onButtonClick, games, platform, steamIsRunning} = props;
 
-    handleClick() {
-        const {
-            onButtonClick,
-            games,
-            platform,
-        } = this.props;
-
+    const handleClick = () => {
         onButtonClick(games, platform);
-    }
+    };
 
-    render() {
-        const { steamIsRunning } = this.props;
-
-        return (
-            <Button
-                style={{ float: "right" }}
-                onClick={this.handleClick}
-                disabled={steamIsRunning}
-            >
+    return (
+        <Button
+            style={{ float: "right" }}
+            onClick={handleClick}
+            disabled={steamIsRunning}
+        >
         Import All
-            </Button>
-        );
-    }
-}
+        </Button>
+    );
+};
 
 ImportAllButton.propTypes = {
     platform: PropTypes.object.isRequired,
