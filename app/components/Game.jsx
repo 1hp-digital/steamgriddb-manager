@@ -37,41 +37,8 @@ class Game extends React.Component {
     const { game } = this.state;
     const self = this;
 
-    Steam.getSteamPath().then((steamPath) => {
-      Steam.getLoggedInUser().then((user) => {
-        const userdataGridPath = join(steamPath, 'userdata', String(user), 'config', 'grid');
-
-        let grid = Steam.getCustomImage('horizontalGrid', userdataGridPath, game.appid);
-        let poster = Steam.getCustomImage('verticalGrid', userdataGridPath, game.appid);
-        let hero = Steam.getCustomImage('hero', userdataGridPath, game.appid);
-        let logo = Steam.getCustomImage('logo', userdataGridPath, game.appid);
-
-        // Find defaults from the cache if it doesn't exist
-        const librarycachePath = join(steamPath, 'appcache', 'librarycache');
-
-        if (!grid && fs.existsSync(join(librarycachePath, `${game.appid}_header.jpg`))) {
-          grid = join(librarycachePath, `${game.appid}_header.jpg`);
-        }
-
-        if (!poster && fs.existsSync(join(librarycachePath, `${game.appid}_library_600x900.jpg`))) {
-          poster = join(librarycachePath, `${game.appid}_library_600x900.jpg`);
-        }
-
-        if (!hero && fs.existsSync(join(librarycachePath, `${game.appid}_library_hero.jpg`))) {
-          hero = join(librarycachePath, `${game.appid}_library_hero.jpg`);
-        }
-
-        if (!logo && fs.existsSync(join(librarycachePath, `${game.appid}_logo.png`))) {
-          logo = join(librarycachePath, `${game.appid}_logo.png`);
-        }
-
-        self.setState({
-          grid,
-          poster,
-          hero,
-          logo,
-        });
-      });
+    Steam.getGameImages(game).then((images) => {
+      self.setState(images);
     });
   }
 

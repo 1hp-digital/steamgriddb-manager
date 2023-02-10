@@ -149,7 +149,7 @@ class GamesList extends React.Component {
     if (toGame) {
       return toGame;
     }
-
+console.log(items);
     return (
       <div style={{ height: 'inherit', overflow: 'hidden' }}>
         <TopBlur additionalHeight={48} />

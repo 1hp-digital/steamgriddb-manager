@@ -74,6 +74,47 @@ class Steam {
     });
   }
 
+  static getGameImages(game) {
+    return new Promise((resolve) => {
+      Steam.getSteamPath().then((steamPath) => {
+        Steam.getLoggedInUser().then((user) => {
+          const userdataGridPath = join(steamPath, 'userdata', String(user), 'config', 'grid');
+
+          let grid = Steam.getCustomImage('horizontalGrid', userdataGridPath, game.appid);
+          let poster = Steam.getCustomImage('verticalGrid', userdataGridPath, game.appid);
+          let hero = Steam.getCustomImage('hero', userdataGridPath, game.appid);
+          let logo = Steam.getCustomImage('logo', userdataGridPath, game.appid);
+
+          // Find defaults from the cache if it doesn't exist
+          const librarycachePath = join(steamPath, 'appcache', 'librarycache');
+
+          if (!grid && fs.existsSync(join(librarycachePath, `${game.appid}_header.jpg`))) {
+            grid = join(librarycachePath, `${game.appid}_header.jpg`);
+          }
+
+          if (!poster && fs.existsSync(join(librarycachePath, `${game.appid}_library_600x900.jpg`))) {
+            poster = join(librarycachePath, `${game.appid}_library_600x900.jpg`);
+          }
+
+          if (!hero && fs.existsSync(join(librarycachePath, `${game.appid}_library_hero.jpg`))) {
+            hero = join(librarycachePath, `${game.appid}_library_hero.jpg`);
+          }
+
+          if (!logo && fs.existsSync(join(librarycachePath, `${game.appid}_logo.png`))) {
+            logo = join(librarycachePath, `${game.appid}_logo.png`);
+          }
+
+          resolve({
+            grid,
+            poster,
+            hero,
+            logo,
+          });
+        });
+      });
+    });
+  }
+
   static getSteamGames() {
     return new Promise((resolve) => {
       this.getSteamPath().then((steamPath) => {
@@ -106,11 +147,13 @@ class Steam {
                   return;
                 }
 
-                games.push({
+                const game = {
                   appid: gameData.AppState.appid,
                   name: gameData.AppState.name,
                   type: 'game',
-                });
+                };
+
+                games.push(game);
               } catch (err) {
                 log.warn(`Error while parsing ${file}: ${err}`);
               }
@@ -146,7 +189,7 @@ class Steam {
               const appid = (item.appid) ?
                 (item.appid >>> 0) : //bitwise unsigned 32 bit ID of manually added non-steam game
                 this.generateNewAppId(exe, appName);
-              
+
 
               if (store.has(`games.${configId}`)) {
                 const storedGame = store.get(`games.${configId}`);
