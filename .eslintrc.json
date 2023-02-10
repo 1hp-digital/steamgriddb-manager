@@ -5,7 +5,7 @@
         "node": true,
         "browser": true
     },
-    "extends": ["airbnb"],
+    "extends": ["eslint:recommended"],
     "settings": {
         "import/core-modules": ["electron"]
     },
@@ -14,17 +14,22 @@
         "SharedArrayBuffer": "readonly",
         "BigInt": true
     },
+    "parser": "@babel/eslint-parser",
+    "parserOptions": {
+        "ecmaVersion": 2018,
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "impliedStrict": true
+        }
+    },
     "rules": {
-        "indent": ["error", 2],
-        "react/jsx-indent": ["error", 2],
-        "class-methods-use-this": ["off"],
-        "no-underscore-dangle": ["off"],
-        "no-param-reassign": ["off"],
-        "react/forbid-prop-types": ["off"],
-        "react/destructuring-assignment": ["off"],
-        "jsx-a11y/click-events-have-key-events": ["off"],
-        "jsx-a11y/no-static-element-interactions": ["off"],
-        "linebreak-style": ["off"],
-        "arrow-body-style": ["off"]
+        "indent": ["error", 4, {
+            "SwitchCase": 1}],
+        "linebreak-style": ["error", "unix"],
+        "quotes": ["error", "double"],
+        "semi": ["error", "always"],
+        "no-console": "off",
+        "curly": "warn",
+        "arrow-parens": ["error", "always"]
     }
 }

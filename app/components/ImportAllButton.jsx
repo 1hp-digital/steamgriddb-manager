@@ -1,48 +1,48 @@
-import React from 'react';
-import Button from 'react-uwp/Button';
-import PropTypes from 'prop-types';
+import React from "react";
+import Button from "react-uwp/Button";
+import PropTypes from "prop-types";
 
 class ImportAllButton extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleClick = this.handleClick.bind(this);
-  }
+    constructor(props) {
+        super(props);
+        this.handleClick = this.handleClick.bind(this);
+    }
 
-  handleClick() {
-    const {
-      onButtonClick,
-      games,
-      platform,
-    } = this.props;
+    handleClick() {
+        const {
+            onButtonClick,
+            games,
+            platform,
+        } = this.props;
 
-    onButtonClick(games, platform);
-  }
+        onButtonClick(games, platform);
+    }
 
-  render() {
-    const { steamIsRunning } = this.props;
+    render() {
+        const { steamIsRunning } = this.props;
 
-    return (
-      <Button
-        style={{ float: 'right' }}
-        onClick={this.handleClick}
-        disabled={steamIsRunning}
-      >
+        return (
+            <Button
+                style={{ float: "right" }}
+                onClick={this.handleClick}
+                disabled={steamIsRunning}
+            >
         Import All
-      </Button>
-    );
-  }
+            </Button>
+        );
+    }
 }
 
 ImportAllButton.propTypes = {
-  platform: PropTypes.object.isRequired,
-  games: PropTypes.array.isRequired,
-  onButtonClick: PropTypes.func,
-  steamIsRunning: PropTypes.bool,
+    platform: PropTypes.object.isRequired,
+    games: PropTypes.array.isRequired,
+    onButtonClick: PropTypes.func,
+    steamIsRunning: PropTypes.bool,
 };
 
 ImportAllButton.defaultProps = {
-  onButtonClick: () => {},
-  steamIsRunning: false,
+    onButtonClick: () => {},
+    steamIsRunning: false,
 };
 
 export default ImportAllButton;
