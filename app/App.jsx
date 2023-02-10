@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { TitleBar } from "react-desktop/windows";
 import { Theme as UWPThemeProvider, getTheme } from "react-uwp/Theme";
 import NavigationView from "react-uwp/NavigationView";
@@ -32,143 +32,140 @@ log.catchErrors({ showDialog: true });
 
 window.Steam = Steam;
 
-class App extends React.Component {
-    constructor(props) {
-        super(props);
+const App = () => {
+    const [isMaximized, setIsMaximized] = useState();
+    const [showBack, setShowBack] = useState();
+    const [redirect, setRedirect] = useState();
 
-        this.state = { isMaximized: false, showBack: false };
-        this.toggleMaximize = this.toggleMaximize.bind(this);
+    const window = remote.getCurrentWindow();
 
-        // Track windows snap calling maximize / unmaximize
+    window.on("maximize", () => {
+        setIsMaximized(true);
+    });
+
+    window.on("unmaximize", () => {
+        setIsMaximized(false);
+    });
+
+    PubSub.subscribe("showBack", (message, args) => {
+        setShowBack(args);
+    });
+
+    const toggleMaximize = () => {
         const window = remote.getCurrentWindow();
 
-        window.on("maximize", () => {
-            this.setState({ isMaximized: true });
-        });
+        setIsMaximized(!isMaximized);
 
-        window.on("unmaximize", () => {
-            this.setState({ isMaximized: false });
-        });
-
-        PubSub.subscribe("showBack", (message, args) => {
-            this.setState({ showBack: args });
-        });
-    }
-
-    toggleMaximize() {
-        const { isMaximized } = this.state;
-        const window = remote.getCurrentWindow();
-        this.setState({ isMaximized: !isMaximized });
         if (!isMaximized) {
             window.maximize();
         } else {
             window.unmaximize();
         }
-    }
+    };
 
-    handleNavRedirect(path) {
-        this.setState({ redirectTo: path });
-    }
+    const handleNavRedirect = (path) => {
+        setRedirect(path);
+    };
 
-    minimize() {
+    const minimize = () => {
         remote.getCurrentWindow().minimize();
-    }
+    };
 
-    close() {
+    const close = () => {
         remote.getCurrentWindow().close();
+    };
+
+    const accentColor = remote.systemPreferences.getAccentColor();
+    const navWidth = 48;
+
+    const navigationTopNodes = [
+        <SplitViewCommand key="0" label="Library" icon="Library" onClick={() => handleNavRedirect("/")} />,
+        <SplitViewCommand key="1" label="Import Games" icon="ImportAll" onClick={() => handleNavRedirect("/import")} />,
+    ];
+
+    let backButton = <></>;
+    let titleWidth = "100%";
+
+    if (showBack) {
+        backButton = (
+            <Link
+                to="/"
+                onClick={() => {
+                    setShowBack(false);
+                }}
+            >
+                <IconButton
+                    style={{
+                        display: "block",
+                        position: "relative",
+                        float: "left",
+                        width: navWidth,
+                        height: 30,
+                        lineHeight: "31px",
+                        backgroundColor: "#141414",
+                        zIndex: 2,
+                    }}
+                    size={22}
+                >
+            Back
+                </IconButton>
+            </Link>
+        );
+        titleWidth = `calc(100% - ${navWidth}px)`;
     }
 
-    render() {
-        const accentColor = remote.systemPreferences.getAccentColor();
-        const navWidth = 48;
-        const { showBack, isMaximized, redirectTo } = this.state;
-
-        const navigationTopNodes = [
-            <SplitViewCommand key="0" label="Library" icon="Library" onClick={() => this.handleNavRedirect("/")} />,
-            <SplitViewCommand key="1" label="Import Games" icon="ImportAll" onClick={() => this.handleNavRedirect("/import")} />,
-        ];
-
-        let backBtn;
-        let titleWidth = "100%";
-        if (showBack) {
-            backBtn = (
-                <Link
-                    to="/"
-                    onClick={() => {
-                        this.setState({ showBack: false });
-                    }}
-                >
-                    <IconButton
+    return (
+        <UWPThemeProvider
+            theme={getTheme({
+                themeName: "dark",
+                accent: `#${accentColor}`,
+                useFluentDesign: true,
+            })}
+        >
+            <Router>
+                <div style={{ backgroundColor: "#1a1a1a" }}>
+                    {backButton}
+                    <TitleBar
+                        title="SteamGridDB Manager"
                         style={{
-                            display: "block",
                             position: "relative",
-                            float: "left",
-                            width: navWidth,
+                            top: 0,
+                            width: titleWidth,
                             height: 30,
-                            lineHeight: "31px",
-                            backgroundColor: "#141414",
                             zIndex: 2,
                         }}
-                        size={22}
+                        controls
+                        isMaximized={isMaximized}
+                        onCloseClick={close}
+                        onMinimizeClick={minimize}
+                        onMaximizeClick={toggleMaximize}
+                        onRestoreDownClick={toggleMaximize}
+                        background="transparent"
+                        color="#fff"
+                        theme="dark"
+                    />
+                    <NavigationView
+                        style={{
+                            position: "absolute",
+                            top: 0,
+                            height: "calc(100vh - 30px)",
+                            width: "100%",
+                        }}
+                        paneStyle={{
+                            marginTop: 30,
+                            backgroundColor: "rgba(0,0,0,.2)",
+                            backgroundImage: `url(${UWPNoise})`,
+                            backdropFilter: "blur(20px)",
+                        }}
+                        background="transparent"
+                        displayMode="overlay"
+                        autoResize={false}
+                        initWidth={navWidth}
+                        navigationTopNodes={navigationTopNodes}
+                        focusNavigationNodeIndex={0}
                     >
-            Back
-                    </IconButton>
-                </Link>
-            );
-            titleWidth = `calc(100% - ${navWidth}px)`;
-        }
-
-        return (
-            <UWPThemeProvider
-                theme={getTheme({
-                    themeName: "dark",
-                    accent: `#${accentColor}`,
-                    useFluentDesign: true,
-                })}
-            >
-                <Router>
-                    <div style={{ backgroundColor: "#1a1a1a" }}>
-                        {backBtn}
-                        <TitleBar
-                            title="SteamGridDB Manager"
+                        <div
                             style={{
-                                position: "relative",
-                                top: 0,
-                                width: titleWidth,
-                                height: 30,
-                                zIndex: 2,
-                            }}
-                            controls
-                            isMaximized={isMaximized}
-                            onCloseClick={this.close}
-                            onMinimizeClick={this.minimize}
-                            onMaximizeClick={this.toggleMaximize}
-                            onRestoreDownClick={this.toggleMaximize}
-                            background="transparent"
-                            color="#fff"
-                            theme="dark"
-                        />
-                        <NavigationView
-                            style={{
-                                position: "absolute",
-                                top: 0,
-                                height: "calc(100vh - 30px)",
-                                width: "100%",
-                            }}
-                            paneStyle={{
-                                marginTop: 30,
-                                backgroundColor: "rgba(0,0,0,.2)",
-                                backgroundImage: `url(${UWPNoise})`,
-                                backdropFilter: "blur(20px)",
-                            }}
-                            background="transparent"
-                            displayMode="overlay"
-                            autoResize={false}
-                            initWidth={navWidth}
-                            navigationTopNodes={navigationTopNodes}
-                            focusNavigationNodeIndex={0}
-                        >
-                            <div style={{
                                 ...getTheme().typographyStyles.base,
                                 marginLeft: navWidth,
                                 height: "100%",
@@ -176,23 +173,23 @@ class App extends React.Component {
                                 overflow: "auto",
                                 zIndex: 0,
                             }}
-                            >
-                                {redirectTo && <Redirect to={redirectTo} />}
+                        >
+                            {redirect && <Redirect to={redirect} />}
 
-                                <Route exact path="/" component={GamesList} />
-                                <Route exact path="/import" component={Import} />
-                                <Route exact path="/game" component={Game} />
-                                <Route exact path="/search" component={Search} />
+                            <Route exact path="/" component={GamesList} />
+                            <Route exact path="/import" component={Import} />
+                            <Route exact path="/game" component={Game} />
+                            <Route exact path="/search" component={Search} />
 
-                            </div>
-                        </NavigationView>
-                    </div>
-                </Router>
+                        </div>
+                    </NavigationView>
+                </div>
+            </Router>
 
-                <ToastHandler />
-            </UWPThemeProvider>
-        );
-    }
-}
+            <ToastHandler />
+        </UWPThemeProvider>
+    );
+
+};
 
 export default App;
