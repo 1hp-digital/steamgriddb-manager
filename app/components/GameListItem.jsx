@@ -1,49 +1,39 @@
 import React from "react";
 import PropTypes from "prop-types";
 import ListView from "react-uwp/ListView";
+import { getTheme } from "react-uwp/Theme";
 
-class GameListItem extends React.Component {
-    constructor(props) {
-        super(props);
+const GameListItem = (props) => {
+    const {platform, platformName, listSource, onItemClick} = props;
 
-        const { platform } = this.props;
+    const theme = getTheme();
 
-        this.platform = platform;
-        this.handleClick = this.handleClick.bind(this);
-    }
+    const handleClick = (index) => {
+        onItemClick(platform, index);
+    };
 
-    handleClick(index) {
-        const { onItemClick } = this.props;
-        onItemClick(this.platform, index);
-    }
-
-    render() {
-        const { platform, platformName, listSource } = this.props;
-        const { theme } = this.context;
-
-        return (
-            <div key={platform} style={{ paddingLeft: 10 }}>
-                <div style={{
-                    ...theme.typographyStyles.subTitleAlt,
-                    display: "inline-block",
-                    position: "sticky",
-                    zIndex: 3,
-                    marginLeft: 10,
-                    top: -22,
-                }}
-                >
-                    {platformName}
-                </div>
-                <ListView
-                    style={{ border: 0, width: "100%" }}
-                    background="transparent"
-                    onChooseItem={this.handleClick}
-                    listSource={listSource}
-                />
+    return (
+        <div key={platform} style={{ paddingLeft: 10 }}>
+            <div style={{
+                ...theme.typographyStyles.subTitleAlt,
+                display: "inline-block",
+                position: "sticky",
+                zIndex: 3,
+                marginLeft: 10,
+                top: -22,
+            }}
+            >
+                {platformName}
             </div>
-        );
-    }
-}
+            <ListView
+                style={{ border: 0, width: "100%" }}
+                background="transparent"
+                onChooseItem={handleClick}
+                listSource={listSource}
+            />
+        </div>
+    );
+};
 
 GameListItem.propTypes = {
     platform: PropTypes.string.isRequired,
