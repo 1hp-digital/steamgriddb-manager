@@ -1,55 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PubSub from "pubsub-js";
 import Toast from "react-uwp/Toast";
 import Icon from "react-uwp/Icon";
 
-class ToastHandler extends React.Component {
-    constructor(props) {
-        super(props);
-        this.close = this.close;
-        this.state = {
-            toasts: [],
-        };
-    }
+const ToastHandler = () => {
+    const [toasts, setToasts] = useState([]);
 
-    componentDidMount() {
+    useEffect(() => {
         PubSub.subscribe("toast", (message, args) => {
-            const { toasts } = this.state;
             const toast = { toast: args, show: true };
-            this.close(toast, 3000);
-            this.setState({
-                toasts: toasts.concat(toast),
-            });
+            close(toast, 3000);
+            setToasts(toasts.concat(toast));
         });
-    }
 
-    close(toast, closeDelay) {
-        const self = this;
+    }, []);
+
+    const close = (toast, closeDelay) => {
         setTimeout(() => {
-            const toasts = self.state.toasts.slice(0);
+            const toasts = toasts.slice(0);
             toasts[toasts.indexOf(toast)].show = false;
-            self.setState({ toasts });
+            setToasts(toasts);
         }, closeDelay);
-    }
+    };
 
-    render() {
-        const { toasts } = this.state;
-        return (
-            <>
-                {toasts.slice(0).map((x, i) => (
-                    <Toast
-                        key={i}
-                        defaultShow={x.show}
-                        logoNode={<Icon>{x.toast.logoNode}</Icon>}
-                        title={x.toast.title}
-                        showCloseIcon
-                    >
-                        {x.toast.contents}
-                    </Toast>
-                ))}
-            </>
-        );
-    }
-}
+    return (
+        <>
+            {toasts.slice(0).map((x, i) => (
+                <Toast
+                    key={i}
+                    defaultShow={x.show}
+                    logoNode={<Icon>{x.toast.logoNode}</Icon>}
+                    title={x.toast.title}
+                    showCloseIcon
+                >
+                    {x.toast.contents}
+                </Toast>
+            ))}
+        </>
+    );
+};
 
 export default ToastHandler;
