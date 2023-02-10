@@ -1,6 +1,10 @@
 const importers = {};
 
 const importAll = (r) => r.keys().forEach((key) => {
+    if (key === "./index.js") {
+        return;
+    }
+
     importers[key] = r(key);
 });
 const context = require.context(".", false, /\.js$/);
