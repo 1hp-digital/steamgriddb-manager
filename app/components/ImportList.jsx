@@ -3,68 +3,56 @@ import ListView from "react-uwp/ListView";
 import PropTypes from "prop-types";
 import ImportListItem from "./ImportListItem";
 
-class ImportList extends React.Component {
-    constructor(props) {
-        super(props);
+const ImportList = (props) => {
+    const {
+        onImportClick,
+        games,
+        grids,
+        platform,
+        steamIsRunning
+    } = props;
 
-        const {
-            onImportClick,
-            games,
-            grids,
-            platform,
-        } = this.props;
+    const listStyle = {
+        background: "none",
+        border: 0,
+        width: "100%",
+        marginBottom: 10,
+        clear: "both",
+    };
 
-        this.onImportClick = onImportClick;
-        this.games = games;
-        this.grids = grids;
-        this.platform = platform;
-    }
+    const importList = games.map((game, i) => {
+        let { progress } = game;
+        let thumb;
 
-    render() {
-        const listStyle = {
-            background: "none",
-            border: 0,
-            width: "100%",
-            marginBottom: 10,
-            clear: "both",
+        if (game.progress === undefined) {
+            progress = 0;
+        }
+
+        if (grids[i]) {
+            thumb = grids[i].thumb;
+        }
+
+        return {
+            itemNode: (
+                <ImportListItem
+                    key={game.id}
+                    progress={progress}
+                    platform={platform}
+                    thumb={thumb}
+                    game={game}
+                    onImportClick={onImportClick}
+                    steamIsRunning={steamIsRunning}
+                />
+            ),
         };
+    });
 
-        const { steamIsRunning } = this.props;
-
-        const importList = this.games.map((game, i) => {
-            let { progress } = game;
-            let thumb;
-
-            if (game.progress === undefined) {
-                progress = 0;
-            }
-
-            if (this.grids[i]) {
-                thumb = this.grids[i].thumb;
-            }
-
-            return {
-                itemNode: (
-                    <ImportListItem
-                        key={game.id}
-                        progress={progress}
-                        platform={this.platform}
-                        thumb={thumb}
-                        game={game}
-                        onImportClick={this.onImportClick}
-                        steamIsRunning={steamIsRunning}
-                    />
-                ),
-            };
-        });
-
-        return (
-            <>
-                <ListView style={listStyle} listSource={importList} />
-            </>
-        );
-    }
-}
+    return (
+        <>
+            <ListView style={listStyle} listSource={importList} />
+        </>
+    );
+};
 
 ImportList.propTypes = {
     games: PropTypes.array.isRequired,
