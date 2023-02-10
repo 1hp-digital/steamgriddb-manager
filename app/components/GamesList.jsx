@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { Redirect } from "react-router-dom";
 import AutoSuggestBox from "react-uwp/AutoSuggestBox";
@@ -13,60 +13,48 @@ import Spinner from "./Spinner";
 import Steam from "../utils/Steam";
 import TopBlur from "./TopBlur";
 import GameListItem from "./GameListItem";
-import platformModules from "../importers";
+import { getTheme } from "react-uwp/Theme";
 
 const log = window.require("electron-log");
 
-class GamesList extends React.Component {
-    constructor(props) {
-        super(props);
-        this.toGame = this.toGame.bind(this);
-        this.refreshGames = this.refreshGames.bind(this);
-        this.filterGames = this.filterGames.bind(this);
-        this.searchInput = debounce((searchTerm) => {
-            this.filterGames(searchTerm);
-        }, 300);
+const GamesList = () => {
+    const searchInput = debounce((searchTerm) => {
+        filterGames(searchTerm);
+    }, 300);
 
-        this.zoom = 1;
+    const platformNames = {
+        steam: "Steam",
+        other: "Other Games",
+    };
 
-        // Fetched games are stored here and shouldn't be changed unless a fetch is triggered again
-        this.fetchedGames = {};
-        this.platformNames = {
-            steam: "Steam",
-            other: "Other Games",
-        };
+    const [fetchedGames, setFetchedGames] = useState({});
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [redirect, setRedirect] = useState(false);
+    const [hasSteam, setHasSteam] = useState(true);
+    const [items, setItems] = useState({});
 
-        Object.keys(platformModules).forEach((module) => {
-            this.platformNames[platformModules[module].id] = platformModules[module].name;
-        });
+    const theme = getTheme();
 
-        this.state = {
-            isLoaded: false,
-            toGame: false,
-            hasSteam: true,
-            items: {},
-        };
-    }
-
-    componentDidMount() {
-        const { items } = this.state;
+    useEffect(() => {
         PubSub.publish("showBack", false);
 
         if (Object.entries(items).length <= 0) {
             Steam.getSteamPath().then(() => {
-                this.fetchGames();
+                fetchGames();
             }).catch(() => {
                 log.warn("Steam is not installed");
-                this.setState({ hasSteam: false });
+                setHasSteam(false);
             });
         }
-    }
+    }, []);
 
-    fetchGames() {
+    const fetchGames = () => {
         const steamGamesPromise = Steam.getSteamGames();
         const nonSteamGamesPromise = Steam.getNonSteamGames();
+
         Promise.all([steamGamesPromise, nonSteamGamesPromise]).then((values) => {
             const items = { steam: values[0], ...values[1] };
+
             // Sort games alphabetically
             Object.keys(items).forEach((platform) => {
                 items[platform] = items[platform].sort((a, b) => {
@@ -78,31 +66,27 @@ class GamesList extends React.Component {
                 });
             });
 
-            this.fetchedGames = items;
-            this.setState({
-                isLoaded: true,
-                items,
-            });
+            setFetchedGames(items);
+            setIsLoaded(true);
+            setItems(items);
         });
-    }
+    };
 
-    toGame(platform, index) {
-        const { items } = this.state;
+    const toGame = (platform, index) => {
         const data = items[platform][index];
-        this.setState({
-            toGame: <Redirect to={{ pathname: "/game", state: data }} />,
-        });
-    }
+        setRedirect(<Redirect to={{ pathname: "/game", state: data }} />);
+    };
 
-    refreshGames() {
-        this.setState({ isLoaded: false });
-        this.fetchGames();
-    }
+    const refreshGames = () => {
+        setIsLoaded(false);
+        fetchGames();
+    };
 
-    filterGames(searchTerm) {
-        const items = { ...this.fetchedGames };
+    const filterGames = (searchTerm) => {
+        const items = { ...fetchedGames };
+
         if (searchTerm.trim() === "") {
-            this.setState({ items });
+            setItems(items);
             return;
         }
 
@@ -120,76 +104,66 @@ class GamesList extends React.Component {
             });
             items[platform] = fuse.search(searchTerm);
         });
-        this.setState({ items });
 
+        setItems(items);
         forceCheck(); // Recheck lazyload
-    }
+    };
 
-    render() {
-        const {
-            isLoaded,
-            hasSteam,
-            items,
-            toGame,
-        } = this.state;
-        const { theme } = this.context;
-
-        if (!hasSteam) {
-            return (
-                <h5 style={{ ...theme.typographyStyles.title, textAlign: "center" }}>
-          Steam installation not found.
-                </h5>
-            );
-        }
-
-        if (!isLoaded) {
-            return <Spinner />;
-        }
-
-        if (toGame) {
-            return toGame;
-        }
-
+    if (!hasSteam) {
         return (
-            <div style={{ height: "inherit", overflow: "hidden" }}>
-                <TopBlur additionalHeight={48} />
-                <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        position: "fixed",
-                        top: 30,
-                        width: "calc(100vw - 55px)",
-                        height: 48,
-                        zIndex: 2,
-                    }}
-                >
-                    <AutoSuggestBox style={{ marginLeft: "auto", marginRight: 24 }} placeholder="Search" onChangeValue={this.searchInput} />
-                    <AppBarSeparator style={{ height: 24 }} />
-                    <AppBarButton
-                        icon="Refresh"
-                        label="Refresh"
-                        onClick={this.refreshGames}
-                    />
-                </div>
-                <div id="grids-container" style={{ height: "100%", overflow: "auto", paddingTop: 64 }}>
-                    {Object.keys(items).map((platform) => (
-                        <GameListItem
-                            key={platform}
-                            platform={platform}
-                            platformName={this.platformNames[platform]}
-                            listSource={[
-                                ...items[platform].map((item) => <p key={item.appid} id={`game-${item.appid}`} game={item}>{item.name}</p>),
-                                <Separator disabled />,
-                            ]}
-                            onItemClick={this.toGame}
-                        />
-                    ))}
-                </div>
-            </div>
+            <h5 style={{ ...theme.typographyStyles.title, textAlign: "center" }}>
+                Steam installation not found.
+            </h5>
         );
     }
-}
+
+    if (!isLoaded) {
+        return <Spinner />;
+    }
+
+    if (redirect) {
+        return redirect;
+    }
+
+    return (
+        <div style={{ height: "inherit", overflow: "hidden" }}>
+            <TopBlur additionalHeight={48} />
+            <div
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    position: "fixed",
+                    top: 30,
+                    width: "calc(100vw - 55px)",
+                    height: 48,
+                    zIndex: 2,
+                }}
+            >
+                <AutoSuggestBox style={{ marginLeft: "auto", marginRight: 24 }} placeholder="Search" onChangeValue={searchInput} />
+                <AppBarSeparator style={{ height: 24 }} />
+                <AppBarButton
+                    icon="Refresh"
+                    label="Refresh"
+                    onClick={refreshGames}
+                />
+            </div>
+            <div id="grids-container" style={{ height: "100%", overflow: "auto", paddingTop: 64 }}>
+                {Object.keys(items).map((platform, i) => (
+                    <GameListItem
+                        key={platform}
+                        platform={platform}
+                        platformName={platformNames[platform]}
+                        listSource={[
+                            ...items[platform].map((item) => <p key={item.appid} id={`game-${item.appid}`} game={item}>{item.name}</p>),
+                            <Separator key={i} disabled />,
+                        ]}
+                        onItemClick={toGame}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+};
 
 GamesList.contextTypes = { theme: PropTypes.object };
 export default GamesList;
