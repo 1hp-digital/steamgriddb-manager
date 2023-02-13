@@ -55,60 +55,57 @@ class Steam {
 
     static async getCurrentUserGridPath() {
         const steamPath = await this.getSteamPath();
+        const user = await this.getLoggedInUser();
 
         return new Promise((resolve) => {
             if (this.currentUserGridPath) {
                 return resolve(this.currentUserGridPath);
             }
-            this.getLoggedInUser()
-                .then((user) => {
-                    const gridPath = join(steamPath, "userdata", String(user), "config", "grid");
-                    if (!fs.existsSync(gridPath)) {
-                        fs.mkdirSync(gridPath);
-                    }
-                    this.currentUserGridPath = gridPath;
-                    resolve(gridPath);
-                });
+            const gridPath = join(steamPath, "userdata", String(user), "config", "grid");
+            if (!fs.existsSync(gridPath)) {
+                fs.mkdirSync(gridPath);
+            }
+            this.currentUserGridPath = gridPath;
+            resolve(gridPath);
         });
     }
 
     static async getGameImages(game) {
         const steamPath = await this.getSteamPath();
+        const user = await this.getLoggedInUser();
 
         return new Promise((resolve) => {
-            Steam.getLoggedInUser().then((user) => {
-                const userdataGridPath = join(steamPath, "userdata", String(user), "config", "grid");
+            const userdataGridPath = join(steamPath, "userdata", String(user), "config", "grid");
 
-                let grid = Steam.getCustomImage("horizontalGrid", userdataGridPath, game.appid);
-                let poster = Steam.getCustomImage("verticalGrid", userdataGridPath, game.appid);
-                let hero = Steam.getCustomImage("hero", userdataGridPath, game.appid);
-                let logo = Steam.getCustomImage("logo", userdataGridPath, game.appid);
+            let grid = Steam.getCustomImage("horizontalGrid", userdataGridPath, game.appid);
+            let poster = Steam.getCustomImage("verticalGrid", userdataGridPath, game.appid);
+            let hero = Steam.getCustomImage("hero", userdataGridPath, game.appid);
+            let logo = Steam.getCustomImage("logo", userdataGridPath, game.appid);
 
-                // Find defaults from the cache if it doesn't exist
-                const librarycachePath = join(steamPath, "appcache", "librarycache");
+            // Find defaults from the cache if it doesn't exist
+            const librarycachePath = join(steamPath, "appcache", "librarycache");
 
-                if (!grid && fs.existsSync(join(librarycachePath, `${game.appid}_header.jpg`))) {
-                    grid = join(librarycachePath, `${game.appid}_header.jpg`);
-                }
+            if (!grid && fs.existsSync(join(librarycachePath, `${game.appid}_header.jpg`))) {
+                grid = join(librarycachePath, `${game.appid}_header.jpg`);
+            }
 
-                if (!poster && fs.existsSync(join(librarycachePath, `${game.appid}_library_600x900.jpg`))) {
-                    poster = join(librarycachePath, `${game.appid}_library_600x900.jpg`);
-                }
+            if (!poster && fs.existsSync(join(librarycachePath, `${game.appid}_library_600x900.jpg`))) {
+                poster = join(librarycachePath, `${game.appid}_library_600x900.jpg`);
+            }
 
-                if (!hero && fs.existsSync(join(librarycachePath, `${game.appid}_library_hero.jpg`))) {
-                    hero = join(librarycachePath, `${game.appid}_library_hero.jpg`);
-                }
+            if (!hero && fs.existsSync(join(librarycachePath, `${game.appid}_library_hero.jpg`))) {
+                hero = join(librarycachePath, `${game.appid}_library_hero.jpg`);
+            }
 
-                if (!logo && fs.existsSync(join(librarycachePath, `${game.appid}_logo.png`))) {
-                    logo = join(librarycachePath, `${game.appid}_logo.png`);
-                }
+            if (!logo && fs.existsSync(join(librarycachePath, `${game.appid}_logo.png`))) {
+                logo = join(librarycachePath, `${game.appid}_logo.png`);
+            }
 
-                resolve({
-                    grid,
-                    poster,
-                    hero,
-                    logo,
-                });
+            resolve({
+                grid,
+                poster,
+                hero,
+                logo,
             });
         });
     }
@@ -169,61 +166,60 @@ class Steam {
 
     static async getNonSteamGames() {
         const steamPath = await this.getSteamPath();
+        const user = await this.getLoggedInUser();
 
         return new Promise((resolve) => {
-            this.getLoggedInUser().then((user) => {
-                const store = new Store();
-                const userdataPath = join(steamPath, "userdata", String(user));
-                const shortcutPath = join(userdataPath, "config", "shortcuts.vdf");
-                const processed = [];
-                shortcut.parseFile(shortcutPath, (err, items) => {
-                    const games = {};
+            const store = new Store();
+            const userdataPath = join(steamPath, "userdata", String(user));
+            const shortcutPath = join(userdataPath, "config", "shortcuts.vdf");
+            const processed = [];
+            shortcut.parseFile(shortcutPath, (err, items) => {
+                const games = {};
 
-                    if (!items) {
-                        return resolve([]);
-                    }
+                if (!items) {
+                    return resolve([]);
+                }
 
-                    items.shortcuts.forEach((item) => {
-                        const appName = item.appname || item.AppName || item.appName;
-                        const exe = item.exe || item.Exe;
-                        const configId = metrohash64(exe + item.LaunchOptions);
-                        const appid = (item.appid) ?
-                            (item.appid >>> 0) : //bitwise unsigned 32 bit ID of manually added non-steam game
-                            this.generateNewAppId(exe, appName);
+                items.shortcuts.forEach((item) => {
+                    const appName = item.appname || item.AppName || item.appName;
+                    const exe = item.exe || item.Exe;
+                    const configId = metrohash64(exe + item.LaunchOptions);
+                    const appid = (item.appid) ?
+                        (item.appid >>> 0) : //bitwise unsigned 32 bit ID of manually added non-steam game
+                        this.generateNewAppId(exe, appName);
 
 
-                        if (store.has(`games.${configId}`)) {
-                            const storedGame = store.get(`games.${configId}`);
-                            if (typeof games[storedGame.platform] === "undefined") {
-                                games[storedGame.platform] = [];
-                            }
+                    if (store.has(`games.${configId}`)) {
+                        const storedGame = store.get(`games.${configId}`);
+                        if (typeof games[storedGame.platform] === "undefined") {
+                            games[storedGame.platform] = [];
+                        }
 
-                            if (!processed.includes(configId)) {
-                                games[storedGame.platform].push({
-                                    gameId: storedGame.id,
-                                    name: appName,
-                                    platform: storedGame.platform,
-                                    type: "shortcut",
-                                    appid,
-                                });
-                                processed.push(configId);
-                            }
-                        } else {
-                            if (!games.other) {
-                                games.other = [];
-                            }
-
-                            games.other.push({
-                                gameId: null,
+                        if (!processed.includes(configId)) {
+                            games[storedGame.platform].push({
+                                gameId: storedGame.id,
                                 name: appName,
-                                platform: "other",
+                                platform: storedGame.platform,
                                 type: "shortcut",
                                 appid,
                             });
+                            processed.push(configId);
                         }
-                    });
-                    return resolve(games);
+                    } else {
+                        if (!games.other) {
+                            games.other = [];
+                        }
+
+                        games.other.push({
+                            gameId: null,
+                            name: appName,
+                            platform: "other",
+                            type: "shortcut",
+                            appid,
+                        });
+                    }
                 });
+                return resolve(games);
             });
         });
     }
@@ -313,13 +309,12 @@ class Steam {
 
     static async getShortcutFile() {
         const steamPath = await this.getSteamPath();
+        const user = await this.getLoggedInUser();
 
         return new Promise((resolve) => {
-            this.getLoggedInUser().then((user) => {
-                const userdataPath = join(steamPath, "userdata", String(user));
-                const shortcutPath = join(userdataPath, "config", "shortcuts.vdf");
-                resolve(shortcutPath);
-            });
+            const userdataPath = join(steamPath, "userdata", String(user));
+            const shortcutPath = join(userdataPath, "config", "shortcuts.vdf");
+            resolve(shortcutPath);
         });
     }
 
@@ -433,97 +428,96 @@ class Steam {
     }
 
     static async checkIfSteamIsRunning() {
+        const user = await this.getLoggedInUser();
+
         return new Promise((resolve) => {
             const levelDBPath = this.getLevelDBPath();
+            const cats = new Categories(levelDBPath, String(user));
 
-            this.getLoggedInUser().then((user) => {
-                const cats = new Categories(levelDBPath, String(user));
-
-                /*
-         * Without checking Windows processes directly, this is the most reliable way
-         * to check if Steam is running. When Steam is running, there is a lock on
-         * this file, so if we can't read it, that means Steam must be running.
-         */
-                cats.read()
-                    .then(() => {
-                        resolve(false);
-                    })
-                    .catch(() => {
-                        resolve(true);
-                    })
-                    .finally(() => {
-                        cats.close();
-                    });
-            });
+            /*
+             * Without checking Windows processes directly, this is the most reliable way
+             * to check if Steam is running. When Steam is running, there is a lock on
+             * this file, so if we can't read it, that means Steam must be running.
+             */
+            cats.read()
+                .then(() => {
+                    resolve(false);
+                })
+                .catch(() => {
+                    resolve(true);
+                })
+                .finally(() => {
+                    cats.close();
+                });
         });
     }
 
-    static addCategory(games, categoryId) {
+    static async addCategory(games, categoryId) {
+        const user = await this.getLoggedInUser();
+
         return new Promise((resolve, reject) => {
             const levelDBPath = this.getLevelDBPath();
 
-            this.getLoggedInUser().then((user) => {
-                const cats = new Categories(levelDBPath, String(user));
+            const cats = new Categories(levelDBPath, String(user));
 
-                cats.read().then(() => {
-                    this.getCurrentUserGridPath().then((userGridPath) => {
-                        const localConfigPath = join(userGridPath, "../", "localconfig.vdf");
-                        const localConfig = VDF.parse(fs.readFileSync(localConfigPath, "utf-8"));
+            cats.read().then(() => {
+                this.getCurrentUserGridPath().then((userGridPath) => {
+                    const localConfigPath = join(userGridPath, "../", "localconfig.vdf");
+                    const localConfig = VDF.parse(fs.readFileSync(localConfigPath, "utf-8"));
 
-                        let collections = {};
-                        if (localConfig.UserLocalConfigStore.WebStorage["user-collections"]) {
-                            collections = JSON.parse(localConfig.UserLocalConfigStore.WebStorage["user-collections"].replace(/\\/g, ""));
+                    let collections = {};
+                    if (localConfig.UserLocalConfigStore.WebStorage["user-collections"]) {
+                        collections = JSON.parse(localConfig.UserLocalConfigStore.WebStorage["user-collections"].replace(/\\/g, ""));
+                    }
+
+                    games.forEach((app) => {
+                        const platformName = categoryId;
+                        const appId = this.generateNewAppId(app.exe, app.name);
+
+                        // Create new category if it doesn't exist
+                        const catKey = `sgdb-${platformName}`; // just use the name as the id
+                        const platformCat = cats.get(catKey);
+                        if (platformCat.is_deleted || !platformCat) {
+                            cats.add(catKey, {
+                                name: platformName,
+                                added: [],
+                            });
                         }
 
-                        games.forEach((app) => {
-                            const platformName = categoryId;
-                            const appId = this.generateNewAppId(app.exe, app.name);
+                        // Create entry in localconfig.vdf
+                        if (!collections[catKey]) {
+                            collections[catKey] = {
+                                id: catKey,
+                                added: [],
+                                removed: [],
+                            };
+                        }
 
-                            // Create new category if it doesn't exist
-                            const catKey = `sgdb-${platformName}`; // just use the name as the id
-                            const platformCat = cats.get(catKey);
-                            if (platformCat.is_deleted || !platformCat) {
-                                cats.add(catKey, {
-                                    name: platformName,
-                                    added: [],
-                                });
-                            }
-
-                            // Create entry in localconfig.vdf
-                            if (!collections[catKey]) {
-                                collections[catKey] = {
-                                    id: catKey,
-                                    added: [],
-                                    removed: [],
-                                };
-                            }
-
-                            // Add appids to localconfig.vdf
-                            if (collections[catKey].added.indexOf(appId) === -1) {
-                                // Only add if it doesn't exist already
-                                collections[catKey].added.push(appId);
-                            }
-                        });
-
-                        cats.save().then(() => {
-                            localConfig.UserLocalConfigStore.WebStorage["user-collections"] = JSON.stringify(collections).replace(/"/g, "\\\""); // I hate Steam
-
-                            const newVDF = VDF.stringify(localConfig);
-
-                            try {
-                                fs.writeFileSync(localConfigPath, newVDF);
-                            } catch (e) {
-                                log.error("Error writing categories file");
-                                console.error(e);
-                            }
-
-                            cats.close();
-                            return resolve();
-                        });
+                        // Add appids to localconfig.vdf
+                        if (collections[catKey].added.indexOf(appId) === -1) {
+                            // Only add if it doesn't exist already
+                            collections[catKey].added.push(appId);
+                        }
                     });
-                }).catch((err) => {
-                    reject(err);
+
+                    cats.save().then(() => {
+                        localConfig.UserLocalConfigStore.WebStorage["user-collections"] = JSON.stringify(collections).replace(/"/g, "\\\""); // I hate Steam
+
+                        const newVDF = VDF.stringify(localConfig);
+
+                        try {
+                            fs.writeFileSync(localConfigPath, newVDF);
+                        } catch (e) {
+                            log.error("Error writing categories file");
+                            console.error(e);
+                        }
+
+                        cats.close();
+                        return resolve();
+                    });
                 });
+            }).catch((err) => {
+                reject(err);
             });
         });
     }
