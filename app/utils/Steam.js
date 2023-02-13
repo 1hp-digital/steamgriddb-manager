@@ -1,6 +1,5 @@
 import SteamID from "steamid";
 import { crc32 } from "crc";
-import React from "react";
 
 const Registry = window.require("winreg");
 const Store = window.require("electron-store");
@@ -17,12 +16,11 @@ const glob = window.require("glob");
 
 class Steam {
     constructor() {
-        this.steamPath = null;
         this.loggedInUser = null;
         this.currentUserGridPath = null;
     }
 
-    static getSteamPath() {
+    static async getSteamPath() {
         return new Promise((resolve, reject) => {
             if (this.steamPath) {
                 return resolve(this.steamPath);
@@ -55,13 +53,15 @@ class Steam {
         });
     }
 
-    static getCurrentUserGridPath() {
+    static async getCurrentUserGridPath() {
+        const steamPath = await this.getSteamPath();
+
         return new Promise((resolve) => {
             if (this.currentUserGridPath) {
                 return resolve(this.currentUserGridPath);
             }
-            this.getSteamPath().then((steamPath) => {
-                this.getLoggedInUser().then((user) => {
+            this.getLoggedInUser()
+                .then((user) => {
                     const gridPath = join(steamPath, "userdata", String(user), "config", "grid");
                     if (!fs.existsSync(gridPath)) {
                         fs.mkdirSync(gridPath);
@@ -69,160 +69,160 @@ class Steam {
                     this.currentUserGridPath = gridPath;
                     resolve(gridPath);
                 });
-            });
-            return false;
         });
     }
 
-    static getGameImages(game) {
+    static async getGameImages(game) {
+        const steamPath = await this.getSteamPath();
+
         return new Promise((resolve) => {
-            Steam.getSteamPath().then((steamPath) => {
-                Steam.getLoggedInUser().then((user) => {
-                    const userdataGridPath = join(steamPath, "userdata", String(user), "config", "grid");
+            Steam.getLoggedInUser().then((user) => {
+                const userdataGridPath = join(steamPath, "userdata", String(user), "config", "grid");
 
-                    let grid = Steam.getCustomImage("horizontalGrid", userdataGridPath, game.appid);
-                    let poster = Steam.getCustomImage("verticalGrid", userdataGridPath, game.appid);
-                    let hero = Steam.getCustomImage("hero", userdataGridPath, game.appid);
-                    let logo = Steam.getCustomImage("logo", userdataGridPath, game.appid);
+                let grid = Steam.getCustomImage("horizontalGrid", userdataGridPath, game.appid);
+                let poster = Steam.getCustomImage("verticalGrid", userdataGridPath, game.appid);
+                let hero = Steam.getCustomImage("hero", userdataGridPath, game.appid);
+                let logo = Steam.getCustomImage("logo", userdataGridPath, game.appid);
 
-                    // Find defaults from the cache if it doesn't exist
-                    const librarycachePath = join(steamPath, "appcache", "librarycache");
+                // Find defaults from the cache if it doesn't exist
+                const librarycachePath = join(steamPath, "appcache", "librarycache");
 
-                    if (!grid && fs.existsSync(join(librarycachePath, `${game.appid}_header.jpg`))) {
-                        grid = join(librarycachePath, `${game.appid}_header.jpg`);
-                    }
+                if (!grid && fs.existsSync(join(librarycachePath, `${game.appid}_header.jpg`))) {
+                    grid = join(librarycachePath, `${game.appid}_header.jpg`);
+                }
 
-                    if (!poster && fs.existsSync(join(librarycachePath, `${game.appid}_library_600x900.jpg`))) {
-                        poster = join(librarycachePath, `${game.appid}_library_600x900.jpg`);
-                    }
+                if (!poster && fs.existsSync(join(librarycachePath, `${game.appid}_library_600x900.jpg`))) {
+                    poster = join(librarycachePath, `${game.appid}_library_600x900.jpg`);
+                }
 
-                    if (!hero && fs.existsSync(join(librarycachePath, `${game.appid}_library_hero.jpg`))) {
-                        hero = join(librarycachePath, `${game.appid}_library_hero.jpg`);
-                    }
+                if (!hero && fs.existsSync(join(librarycachePath, `${game.appid}_library_hero.jpg`))) {
+                    hero = join(librarycachePath, `${game.appid}_library_hero.jpg`);
+                }
 
-                    if (!logo && fs.existsSync(join(librarycachePath, `${game.appid}_logo.png`))) {
-                        logo = join(librarycachePath, `${game.appid}_logo.png`);
-                    }
+                if (!logo && fs.existsSync(join(librarycachePath, `${game.appid}_logo.png`))) {
+                    logo = join(librarycachePath, `${game.appid}_logo.png`);
+                }
 
-                    resolve({
-                        grid,
-                        poster,
-                        hero,
-                        logo,
-                    });
+                resolve({
+                    grid,
+                    poster,
+                    hero,
+                    logo,
                 });
             });
         });
     }
 
-    static getSteamGames() {
+    static async getSteamGames() {
+        const steamPath = await this.getSteamPath();
+
         return new Promise((resolve) => {
-            this.getSteamPath().then((steamPath) => {
-                const parsedLibFolders = VDF.parse(fs.readFileSync(join(steamPath, "steamapps", "libraryfolders.vdf"), "utf-8"));
-                const games = [];
+            const parsedLibFolders = VDF.parse(fs.readFileSync(join(steamPath, "steamapps", "libraryfolders.vdf"), "utf-8"));
+            const games = [];
 
-                // Load extra library paths from libraryfolders.vdf
-                const extraLibraries = Object.entries(parsedLibFolders.LibraryFolders || parsedLibFolders.libraryfolders || {})
-                    .filter(([key]) => !Number.isNaN(parseInt(key, 10)))
-                    .filter(([_, library]) => typeof library === "string" || library.mounted !== 0)
-                    .map(([_, library]) => typeof library === "string" ? library : library.path);
+            // Load extra library paths from libraryfolders.vdf
+            const extraLibraries = Object.entries(parsedLibFolders.LibraryFolders || parsedLibFolders.libraryfolders || {})
+                .filter(([key]) => !Number.isNaN(parseInt(key, 10)))
+            // eslint-disable-next-line no-unused-vars
+                .filter(([_, library]) => typeof library === "string" || library.mounted !== 0)
+            // eslint-disable-next-line no-unused-vars
+                .map(([_, library]) => typeof library === "string" ? library : library.path);
 
-                // Add Steam install dir and extra libraries
-                const libraries = [steamPath, ...extraLibraries];
+            // Add Steam install dir and extra libraries
+            const libraries = [steamPath, ...extraLibraries];
 
-                log.info(`Found ${libraries.length} Steam libraries`);
+            log.info(`Found ${libraries.length} Steam libraries`);
 
-                libraries.forEach((library) => {
-                    const appsPath = join(library, "steamapps");
-                    const files = fs.readdirSync(appsPath);
-                    files.forEach((file) => {
-                        const ext = file.split(".").pop();
+            libraries.forEach((library) => {
+                const appsPath = join(library, "steamapps");
+                const files = fs.readdirSync(appsPath);
+                files.forEach((file) => {
+                    const ext = file.split(".").pop();
 
-                        if (ext === "acf") {
-                            const filePath = join(appsPath, file);
-                            const data = fs.readFileSync(filePath, "utf-8");
-                            try {
-                                const gameData = VDF.parse(data);
-                                if (gameData.AppState.appid === 228980) {
-                                    return;
-                                }
-
-                                const game = {
-                                    appid: gameData.AppState.appid,
-                                    name: gameData.AppState.name,
-                                    type: "game",
-                                };
-
-                                games.push(game);
-                            } catch (err) {
-                                log.warn(`Error while parsing ${file}: ${err}`);
+                    if (ext === "acf") {
+                        const filePath = join(appsPath, file);
+                        const data = fs.readFileSync(filePath, "utf-8");
+                        try {
+                            const gameData = VDF.parse(data);
+                            if (gameData.AppState.appid === 228980) {
+                                return;
                             }
-                        }
-                    });
-                });
-                log.info(`Fetched ${games.length} Steam games`);
 
-                resolve(games);
+                            const game = {
+                                appid: gameData.AppState.appid,
+                                name: gameData.AppState.name,
+                                type: "game",
+                            };
+
+                            games.push(game);
+                        } catch (err) {
+                            log.warn(`Error while parsing ${file}: ${err}`);
+                        }
+                    }
+                });
             });
+            log.info(`Fetched ${games.length} Steam games`);
+
+            resolve(games);
         });
     }
 
-    static getNonSteamGames() {
+    static async getNonSteamGames() {
+        const steamPath = await this.getSteamPath();
+
         return new Promise((resolve) => {
-            this.getSteamPath().then((steamPath) => {
-                this.getLoggedInUser().then((user) => {
-                    const store = new Store();
-                    const userdataPath = join(steamPath, "userdata", String(user));
-                    const shortcutPath = join(userdataPath, "config", "shortcuts.vdf");
-                    const processed = [];
-                    shortcut.parseFile(shortcutPath, (err, items) => {
-                        const games = {};
+            this.getLoggedInUser().then((user) => {
+                const store = new Store();
+                const userdataPath = join(steamPath, "userdata", String(user));
+                const shortcutPath = join(userdataPath, "config", "shortcuts.vdf");
+                const processed = [];
+                shortcut.parseFile(shortcutPath, (err, items) => {
+                    const games = {};
 
-                        if (!items) {
-                            return resolve([]);
-                        }
+                    if (!items) {
+                        return resolve([]);
+                    }
 
-                        items.shortcuts.forEach((item) => {
-                            const appName = item.appname || item.AppName || item.appName;
-                            const exe = item.exe || item.Exe;
-                            const configId = metrohash64(exe + item.LaunchOptions);
-                            const appid = (item.appid) ?
-                                (item.appid >>> 0) : //bitwise unsigned 32 bit ID of manually added non-steam game
-                                this.generateNewAppId(exe, appName);
+                    items.shortcuts.forEach((item) => {
+                        const appName = item.appname || item.AppName || item.appName;
+                        const exe = item.exe || item.Exe;
+                        const configId = metrohash64(exe + item.LaunchOptions);
+                        const appid = (item.appid) ?
+                            (item.appid >>> 0) : //bitwise unsigned 32 bit ID of manually added non-steam game
+                            this.generateNewAppId(exe, appName);
 
 
-                            if (store.has(`games.${configId}`)) {
-                                const storedGame = store.get(`games.${configId}`);
-                                if (typeof games[storedGame.platform] === "undefined") {
-                                    games[storedGame.platform] = [];
-                                }
+                        if (store.has(`games.${configId}`)) {
+                            const storedGame = store.get(`games.${configId}`);
+                            if (typeof games[storedGame.platform] === "undefined") {
+                                games[storedGame.platform] = [];
+                            }
 
-                                if (!processed.includes(configId)) {
-                                    games[storedGame.platform].push({
-                                        gameId: storedGame.id,
-                                        name: appName,
-                                        platform: storedGame.platform,
-                                        type: "shortcut",
-                                        appid,
-                                    });
-                                    processed.push(configId);
-                                }
-                            } else {
-                                if (!games.other) {
-                                    games.other = [];
-                                }
-
-                                games.other.push({
-                                    gameId: null,
+                            if (!processed.includes(configId)) {
+                                games[storedGame.platform].push({
+                                    gameId: storedGame.id,
                                     name: appName,
-                                    platform: "other",
+                                    platform: storedGame.platform,
                                     type: "shortcut",
                                     appid,
                                 });
+                                processed.push(configId);
                             }
-                        });
-                        return resolve(games);
+                        } else {
+                            if (!games.other) {
+                                games.other = [];
+                            }
+
+                            games.other.push({
+                                gameId: null,
+                                name: appName,
+                                platform: "other",
+                                type: "shortcut",
+                                appid,
+                            });
+                        }
                     });
+                    return resolve(games);
                 });
             });
         });
@@ -245,27 +245,27 @@ class Steam {
     }
     /* eslint-enable no-bitwise, no-mixed-operators */
 
-    static getLoggedInUser() {
+    static async getLoggedInUser() {
+        const steamPath = await this.getSteamPath();
+
         return new Promise((resolve) => {
             if (this.loggedInUser) {
                 return resolve(this.loggedInUser);
             }
 
-            this.getSteamPath().then((steamPath) => {
-                const loginusersPath = join(steamPath, "config", "loginusers.vdf");
-                const data = fs.readFileSync(loginusersPath, "utf-8");
-                const loginusersData = VDF.parse(data);
+            const loginusersPath = join(steamPath, "config", "loginusers.vdf");
+            const data = fs.readFileSync(loginusersPath, "utf-8");
+            const loginusersData = VDF.parse(data);
 
-                Object.keys(loginusersData.users).forEach((user) => {
-                    if (loginusersData.users[user].MostRecent || loginusersData.users[user].mostrecent) {
-                        const { accountid } = (new SteamID(user));
-                        this.loggedInUser = accountid;
-                        log.info(`Got Steam user: ${accountid}`);
-                        resolve(accountid);
-                        return true;
-                    }
-                    return false;
-                });
+            Object.keys(loginusersData.users).forEach((user) => {
+                if (loginusersData.users[user].MostRecent || loginusersData.users[user].mostrecent) {
+                    const { accountid } = (new SteamID(user));
+                    this.loggedInUser = accountid;
+                    log.info(`Got Steam user: ${accountid}`);
+                    resolve(accountid);
+                    return true;
+                }
+                return false;
             });
 
             return false;
@@ -311,14 +311,14 @@ class Steam {
         return image;
     }
 
-    static getShortcutFile() {
+    static async getShortcutFile() {
+        const steamPath = await this.getSteamPath();
+
         return new Promise((resolve) => {
-            this.getSteamPath().then((steamPath) => {
-                this.getLoggedInUser().then((user) => {
-                    const userdataPath = join(steamPath, "userdata", String(user));
-                    const shortcutPath = join(userdataPath, "config", "shortcuts.vdf");
-                    resolve(shortcutPath);
-                });
+            this.getLoggedInUser().then((user) => {
+                const userdataPath = join(steamPath, "userdata", String(user));
+                const shortcutPath = join(userdataPath, "config", "shortcuts.vdf");
+                resolve(shortcutPath);
             });
         });
     }
