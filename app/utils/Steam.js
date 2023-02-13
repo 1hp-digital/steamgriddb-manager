@@ -318,62 +318,62 @@ class Steam {
         });
     }
 
-    static addAsset(type, appId, url) {
+    static async addAsset(type, appId, url) {
+        const userGridPath = await this.getCurrentUserGridPath();
+
         return new Promise((resolve, reject) => {
-            this.getCurrentUserGridPath().then((userGridPath) => {
-                const imageUrl = url;
-                const imageExt = extname(imageUrl);
+            const imageUrl = url;
+            const imageExt = extname(imageUrl);
 
-                let dest;
+            let dest;
 
-                switch (type) {
-                    case "horizontalGrid":
-                        dest = join(userGridPath, `${appId}${imageExt}`);
-                        break;
-                    case "verticalGrid":
-                        dest = join(userGridPath, `${appId}p${imageExt}`);
-                        break;
-                    case "hero":
-                        dest = join(userGridPath, `${appId}_hero${imageExt}`);
-                        break;
-                    case "logo":
-                        dest = join(userGridPath, `${appId}_logo${imageExt}`);
-                        break;
-                    default:
-                        reject();
-                }
+            switch (type) {
+                case "horizontalGrid":
+                    dest = join(userGridPath, `${appId}${imageExt}`);
+                    break;
+                case "verticalGrid":
+                    dest = join(userGridPath, `${appId}p${imageExt}`);
+                    break;
+                case "hero":
+                    dest = join(userGridPath, `${appId}_hero${imageExt}`);
+                    break;
+                case "logo":
+                    dest = join(userGridPath, `${appId}_logo${imageExt}`);
+                    break;
+                default:
+                    reject();
+            }
 
-                let cur = 0;
-                const data = new Stream();
-                let progress = 0;
-                let lastProgress = 0;
-                https.get(url, (response) => {
-                    const len = parseInt(response.headers["content-length"], 10);
+            let cur = 0;
+            const data = new Stream();
+            let progress = 0;
+            let lastProgress = 0;
+            https.get(url, (response) => {
+                const len = parseInt(response.headers["content-length"], 10);
 
-                    response.on("data", (chunk) => {
-                        cur += chunk.length;
-                        data.push(chunk);
-                        progress = Math.round((cur / len) * 10) / 10;
-                        if (progress !== lastProgress) {
-                            lastProgress = progress;
-                        }
-                    });
-
-                    response.on("end", () => {
-                        // Delete old image(s)
-                        glob(`${dest.replace(imageExt, "")}.*`, (er, files) => {
-                            files.forEach((file) => {
-                                fs.unlinkSync(file);
-                            });
-
-                            fs.writeFileSync(dest, data.read());
-                            resolve(dest);
-                        });
-                    });
-                }).on("error", (err) => {
-                    fs.unlink(dest);
-                    reject(err);
+                response.on("data", (chunk) => {
+                    cur += chunk.length;
+                    data.push(chunk);
+                    progress = Math.round((cur / len) * 10) / 10;
+                    if (progress !== lastProgress) {
+                        lastProgress = progress;
+                    }
                 });
+
+                response.on("end", () => {
+                    // Delete old image(s)
+                    glob(`${dest.replace(imageExt, "")}.*`, (er, files) => {
+                        files.forEach((file) => {
+                            fs.unlinkSync(file);
+                        });
+
+                        fs.writeFileSync(dest, data.read());
+                        resolve(dest);
+                    });
+                });
+            }).on("error", (err) => {
+                fs.unlink(dest);
+                reject(err);
             });
         });
     }
@@ -454,6 +454,7 @@ class Steam {
 
     static async addCategory(games, categoryId) {
         const user = await this.getLoggedInUser();
+        const userGridPath = await this.getCurrentUserGridPath();
 
         return new Promise((resolve, reject) => {
             const levelDBPath = this.getLevelDBPath();
@@ -461,60 +462,58 @@ class Steam {
             const cats = new Categories(levelDBPath, String(user));
 
             cats.read().then(() => {
-                this.getCurrentUserGridPath().then((userGridPath) => {
-                    const localConfigPath = join(userGridPath, "../", "localconfig.vdf");
-                    const localConfig = VDF.parse(fs.readFileSync(localConfigPath, "utf-8"));
+                const localConfigPath = join(userGridPath, "../", "localconfig.vdf");
+                const localConfig = VDF.parse(fs.readFileSync(localConfigPath, "utf-8"));
 
-                    let collections = {};
-                    if (localConfig.UserLocalConfigStore.WebStorage["user-collections"]) {
-                        collections = JSON.parse(localConfig.UserLocalConfigStore.WebStorage["user-collections"].replace(/\\/g, ""));
+                let collections = {};
+                if (localConfig.UserLocalConfigStore.WebStorage["user-collections"]) {
+                    collections = JSON.parse(localConfig.UserLocalConfigStore.WebStorage["user-collections"].replace(/\\/g, ""));
+                }
+
+                games.forEach((app) => {
+                    const platformName = categoryId;
+                    const appId = this.generateNewAppId(app.exe, app.name);
+
+                    // Create new category if it doesn't exist
+                    const catKey = `sgdb-${platformName}`; // just use the name as the id
+                    const platformCat = cats.get(catKey);
+                    if (platformCat.is_deleted || !platformCat) {
+                        cats.add(catKey, {
+                            name: platformName,
+                            added: [],
+                        });
                     }
 
-                    games.forEach((app) => {
-                        const platformName = categoryId;
-                        const appId = this.generateNewAppId(app.exe, app.name);
+                    // Create entry in localconfig.vdf
+                    if (!collections[catKey]) {
+                        collections[catKey] = {
+                            id: catKey,
+                            added: [],
+                            removed: [],
+                        };
+                    }
 
-                        // Create new category if it doesn't exist
-                        const catKey = `sgdb-${platformName}`; // just use the name as the id
-                        const platformCat = cats.get(catKey);
-                        if (platformCat.is_deleted || !platformCat) {
-                            cats.add(catKey, {
-                                name: platformName,
-                                added: [],
-                            });
-                        }
+                    // Add appids to localconfig.vdf
+                    if (collections[catKey].added.indexOf(appId) === -1) {
+                        // Only add if it doesn't exist already
+                        collections[catKey].added.push(appId);
+                    }
+                });
 
-                        // Create entry in localconfig.vdf
-                        if (!collections[catKey]) {
-                            collections[catKey] = {
-                                id: catKey,
-                                added: [],
-                                removed: [],
-                            };
-                        }
+                cats.save().then(() => {
+                    localConfig.UserLocalConfigStore.WebStorage["user-collections"] = JSON.stringify(collections).replace(/"/g, "\\\""); // I hate Steam
 
-                        // Add appids to localconfig.vdf
-                        if (collections[catKey].added.indexOf(appId) === -1) {
-                            // Only add if it doesn't exist already
-                            collections[catKey].added.push(appId);
-                        }
-                    });
+                    const newVDF = VDF.stringify(localConfig);
 
-                    cats.save().then(() => {
-                        localConfig.UserLocalConfigStore.WebStorage["user-collections"] = JSON.stringify(collections).replace(/"/g, "\\\""); // I hate Steam
+                    try {
+                        fs.writeFileSync(localConfigPath, newVDF);
+                    } catch (e) {
+                        log.error("Error writing categories file");
+                        console.error(e);
+                    }
 
-                        const newVDF = VDF.stringify(localConfig);
-
-                        try {
-                            fs.writeFileSync(localConfigPath, newVDF);
-                        } catch (e) {
-                            log.error("Error writing categories file");
-                            console.error(e);
-                        }
-
-                        cats.close();
-                        return resolve();
-                    });
+                    cats.close();
+                    return resolve();
                 });
             }).catch((err) => {
                 reject(err);
