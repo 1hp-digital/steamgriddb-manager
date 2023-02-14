@@ -378,47 +378,47 @@ class Steam {
         });
     }
 
-    static addShortcuts(shortcuts) {
+    static async addShortcuts(shortcuts) {
+        const shortcutPath = await this.getShortcutFile();
+
         return new Promise((resolve) => {
-            this.getShortcutFile().then((shortcutPath) => {
-                shortcut.parseFile(shortcutPath, (err, items) => {
-                    const newShorcuts = {
-                        shortcuts: [],
-                    };
+            shortcut.parseFile(shortcutPath, (err, items) => {
+                const newShorcuts = {
+                    shortcuts: [],
+                };
 
-                    let apps = [];
-                    if (typeof items !== "undefined") {
-                        apps = items.shortcuts;
-                    }
+                let apps = [];
+                if (typeof items !== "undefined") {
+                    apps = items.shortcuts;
+                }
 
-                    shortcuts.forEach((value) => {
-                        // Don't add dupes
-                        apps.some((app) => {
-                            const appid = this.generateAppId(app.exe, app.appname);
-                            if (this.generateAppId(value.exe, value.name) === appid) {
-                                return true;
-                            }
-                            return false;
-                        });
-
-                        apps.push({
-                            appname: value.name,
-                            exe: value.exe,
-                            StartDir: value.startIn,
-                            LaunchOptions: value.params,
-                            icon: (typeof value.icon !== "undefined" ? value.icon : ""),
-                            IsHidden: false,
-                            ShortcutPath: "",
-                            AllowDesktopConfig: true,
-                            OpenVR: false,
-                            tags: (typeof value.tags !== "undefined" ? value.tags : []),
-                        });
+                shortcuts.forEach((value) => {
+                    // Don't add dupes
+                    apps.some((app) => {
+                        const appid = this.generateAppId(app.exe, app.appname);
+                        if (this.generateAppId(value.exe, value.name) === appid) {
+                            return true;
+                        }
+                        return false;
                     });
 
-                    newShorcuts.shortcuts = apps;
-
-                    shortcut.writeFile(shortcutPath, newShorcuts, () => resolve());
+                    apps.push({
+                        appname: value.name,
+                        exe: value.exe,
+                        StartDir: value.startIn,
+                        LaunchOptions: value.params,
+                        icon: (typeof value.icon !== "undefined" ? value.icon : ""),
+                        IsHidden: false,
+                        ShortcutPath: "",
+                        AllowDesktopConfig: true,
+                        OpenVR: false,
+                        tags: (typeof value.tags !== "undefined" ? value.tags : []),
+                    });
                 });
+
+                newShorcuts.shortcuts = apps;
+
+                shortcut.writeFile(shortcutPath, newShorcuts, () => resolve());
             });
         });
     }
