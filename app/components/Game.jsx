@@ -27,12 +27,16 @@ const Game = (props) => {
     useEffect(() => {
         PubSub.publish("showBack", true);
 
-        Steam.getGameImages(game).then((images) => {
+        const fetchData = async () => {
+            const images = await Steam.getGameImages(game);
+
             setGrid(images.grid);
             setPoster(images.poster);
             setHero(images.hero);
             setLogo(images.logo);
-        });
+        };
+
+        fetchData();
     }, []);
 
     const toSearch = (assetType) => {

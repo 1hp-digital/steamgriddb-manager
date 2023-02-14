@@ -52,15 +52,14 @@ const GamesList = () => {
         fetchData();
     }, []);
 
-    const fetchGames = () => {
-        const steamGamesPromise = Steam.getSteamGames();
-        const nonSteamGamesPromise = Steam.getNonSteamGames();
+    const fetchGames = async () => {
+        const steamGames = await Steam.getSteamGames();
+        const nonSteamGames = await Steam.getNonSteamGames();
+        const items = {steam: steamGames, ...nonSteamGames};
 
-        Promise.all([steamGamesPromise, nonSteamGamesPromise]).then((values) => {
-            const items = { steam: values[0], ...values[1] };
-
-            // Sort games alphabetically
-            Object.keys(items).forEach((platform) => {
+        // Sort games alphabetically
+        Object.keys(items)
+            .forEach((platform) => {
                 items[platform] = items[platform].sort((a, b) => {
                     if (a.name > b.name) {
                         return 1;
@@ -70,10 +69,9 @@ const GamesList = () => {
                 });
             });
 
-            setFetchedGames(items);
-            setIsLoaded(true);
-            setItems(items);
-        });
+        setFetchedGames(items);
+        setIsLoaded(true);
+        setItems(items);
     };
 
     const toGame = (platform, index) => {
