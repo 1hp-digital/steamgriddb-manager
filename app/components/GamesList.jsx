@@ -38,14 +38,18 @@ const GamesList = () => {
     useEffect(() => {
         PubSub.publish("showBack", false);
 
-        if (Object.entries(items).length <= 0) {
-            Steam.getSteamPath().then(() => {
-                fetchGames();
-            }).catch(() => {
+        const fetchData = async () => {
+            const steamPath = await Steam.getSteamPath();
+
+            if (!steamPath) {
                 log.warn("Steam is not installed");
                 setHasSteam(false);
-            });
-        }
+            }
+
+            fetchGames();
+        };
+
+        fetchData();
     }, []);
 
     const fetchGames = () => {
