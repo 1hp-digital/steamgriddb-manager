@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import * as React from "react";
 import { TitleBar } from "react-desktop/windows";
 import { Theme as UWPThemeProvider, getTheme } from "react-uwp/Theme";
 import NavigationView from "react-uwp/NavigationView";
@@ -12,15 +12,13 @@ import {
     Route,
 } from "react-router-dom";
 import ToastHandler from "./components/ToastHandler";
-
 import UWPNoise from "./images/uwp-noise.png";
 import "./styles/App.css";
 import GamesList from "./components/GamesList";
 import Game from "./components/Game";
 import Import from "./components/Import";
 import Search from "./components/Search";
-
-import Steam from "./utils/Steam";
+import {useState} from "react";
 
 // Using window.require so babel doesn't change the node require
 const electron = window.require("electron");
@@ -30,11 +28,9 @@ const { remote } = electron;
 const log = window.require("electron-log");
 log.catchErrors({ showDialog: true });
 
-window.Steam = Steam;
-
 const App = () => {
-    const [isMaximized, setIsMaximized] = useState();
-    const [showBack, setShowBack] = useState();
+    const [isMaximized, setIsMaximized] = useState(false);
+    const [showBack, setShowBack] = useState(false);
     const [redirect, setRedirect] = useState();
 
     const window = remote.getCurrentWindow();

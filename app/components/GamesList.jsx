@@ -12,7 +12,7 @@ import { forceCheck } from "react-lazyload";
 import Spinner from "./Spinner";
 import Steam from "../utils/Steam";
 import TopBlur from "./TopBlur";
-import GameListItem from "./GameListItem";
+import GameListItem from "./GameListItem.tsx";
 import { getTheme } from "react-uwp/Theme";
 
 const log = window.require("electron-log");

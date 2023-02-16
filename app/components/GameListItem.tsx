@@ -1,5 +1,5 @@
-import React from "react";
-import PropTypes from "prop-types";
+import * as React from "react";
+import * as PropTypes from "prop-types";
 import ListView from "react-uwp/ListView";
 import { getTheme } from "react-uwp/Theme";
 
