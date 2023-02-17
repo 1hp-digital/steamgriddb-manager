@@ -18,7 +18,7 @@ import GamesList from "./components/GamesList";
 import Game from "./components/Game";
 import Import from "./components/Import";
 import Search from "./components/Search";
-import {useState} from "react";
+import {ReactElement, useState} from "react";
 
 // Using window.require so babel doesn't change the node require
 const electron = window.require("electron");
@@ -28,7 +28,7 @@ const { remote } = electron;
 const log = window.require("electron-log");
 log.catchErrors({ showDialog: true });
 
-const App = () => {
+const App = ():ReactElement => {
     const [isMaximized, setIsMaximized] = useState(false);
     const [showBack, setShowBack] = useState(false);
     const [redirect, setRedirect] = useState();
@@ -47,7 +47,7 @@ const App = () => {
         setShowBack(args);
     });
 
-    const toggleMaximize = () => {
+    const toggleMaximize = ():void => {
         const window = remote.getCurrentWindow();
 
         setIsMaximized(!isMaximized);
@@ -59,15 +59,15 @@ const App = () => {
         }
     };
 
-    const handleNavRedirect = (path) => {
+    const handleNavRedirect = (path):void => {
         setRedirect(path);
     };
 
-    const minimize = () => {
+    const minimize = ():void => {
         remote.getCurrentWindow().minimize();
     };
 
-    const close = () => {
+    const close = ():void => {
         remote.getCurrentWindow().close();
     };
 
@@ -75,8 +75,8 @@ const App = () => {
     const navWidth = 48;
 
     const navigationTopNodes = [
-        <SplitViewCommand key="0" label="Library" icon="Library" onClick={() => handleNavRedirect("/")} />,
-        <SplitViewCommand key="1" label="Import Games" icon="ImportAll" onClick={() => handleNavRedirect("/import")} />,
+        <SplitViewCommand key="0" label="Library" icon="Library" onClick={():void => handleNavRedirect("/")} />,
+        <SplitViewCommand key="1" label="Import Games" icon="ImportAll" onClick={():void => handleNavRedirect("/import")} />,
     ];
 
     let backButton = <></>;
@@ -86,7 +86,7 @@ const App = () => {
         backButton = (
             <Link
                 to="/"
-                onClick={() => {
+                onClick={():void => {
                     setShowBack(false);
                 }}
             >
