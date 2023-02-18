@@ -14,6 +14,7 @@ import Steam from "../utils/Steam";
 import TopBlur from "./TopBlur";
 import GameListItem from "./GameListItem.tsx";
 import { getTheme } from "react-uwp/Theme";
+import getSteamPath from "../utils/steam/getSteamPath";
 
 const log = window.require("electron-log");
 
@@ -39,7 +40,7 @@ const GamesList = () => {
         PubSub.publish("showBack", false);
 
         const fetchData = async () => {
-            const steamPath = await Steam.getSteamPath();
+            const steamPath = await getSteamPath();
 
             if (!steamPath) {
                 log.warn("Steam is not installed");

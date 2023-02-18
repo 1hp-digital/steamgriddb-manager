@@ -11,6 +11,7 @@ import capsuleVerticalPlaceholder from "../images/capsule_vertical_none.png";
 import capsulePlaceholder from "../images/capsule_none.png";
 import logoPlaceholder from "../images/logo_none.png";
 import { getTheme } from "react-uwp/Theme";
+import Spinner from "./Spinner";
 
 const Game = (props) => {
     const {location} = props;
@@ -21,6 +22,7 @@ const Game = (props) => {
     const [hero, setHero] = useState();
     const [logo, setLogo] = useState();
     const [redirect, setRedirect] = useState();
+    const [isLoaded, setIsLoaded] = useState(false);
 
     const theme = getTheme();
 
@@ -34,6 +36,7 @@ const Game = (props) => {
             setPoster(images.poster);
             setHero(images.hero);
             setLogo(images.logo);
+            setIsLoaded(true);
         };
 
         fetchData();
@@ -63,6 +66,10 @@ const Game = (props) => {
     const buttonStyle = {
         padding: 0,
     };
+
+    if (!isLoaded) {
+        return <Spinner />;
+    }
 
     return (
         <>

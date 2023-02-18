@@ -1,7 +1,7 @@
 import SteamID from "steamid";
 import { crc32 } from "crc";
+import getSteamPath from "./steam/getSteamPath";
 
-const Registry = window.require("winreg");
 const Store = window.require("electron-store");
 const fs = window.require("fs");
 const { join, extname } = window.require("path");
@@ -20,41 +20,8 @@ class Steam {
         this.currentUserGridPath = null;
     }
 
-    static async getSteamPath() {
-        return new Promise((resolve, reject) => {
-            if (this.steamPath) {
-                return resolve(this.steamPath);
-            }
-
-            const key = new Registry({
-                hive: Registry.HKCU,
-                key: "\\Software\\Valve\\Steam",
-            });
-
-            key.values((err, items) => {
-                let steamPath = false;
-
-                items.forEach((item) => {
-                    if (item.name === "SteamPath") {
-                        steamPath = item.value;
-                    }
-                });
-
-                if (steamPath) {
-                    this.steamPath = steamPath;
-                    log.info(`Got Steam path: ${steamPath}`);
-                    return resolve(steamPath);
-                }
-
-                return reject(new Error("Could not find Steam path."));
-            });
-
-            return false;
-        });
-    }
-
     static async getCurrentUserGridPath() {
-        const steamPath = await this.getSteamPath();
+        const steamPath = await getSteamPath();
         const user = await this.getLoggedInUser();
 
         return new Promise((resolve) => {
@@ -71,7 +38,7 @@ class Steam {
     }
 
     static async getGameImages(game) {
-        const steamPath = await this.getSteamPath();
+        const steamPath = await getSteamPath();
         const user = await this.getLoggedInUser();
 
         return new Promise((resolve) => {
@@ -111,7 +78,7 @@ class Steam {
     }
 
     static async getSteamGames() {
-        const steamPath = await this.getSteamPath();
+        const steamPath = await getSteamPath();
 
         return new Promise((resolve) => {
             const parsedLibFolders = VDF.parse(fs.readFileSync(join(steamPath, "steamapps", "libraryfolders.vdf"), "utf-8"));
@@ -165,7 +132,7 @@ class Steam {
     }
 
     static async getNonSteamGames() {
-        const steamPath = await this.getSteamPath();
+        const steamPath = await getSteamPath();
         const user = await this.getLoggedInUser();
 
         return new Promise((resolve) => {
@@ -242,7 +209,7 @@ class Steam {
     /* eslint-enable no-bitwise, no-mixed-operators */
 
     static async getLoggedInUser() {
-        const steamPath = await this.getSteamPath();
+        const steamPath = await getSteamPath();
 
         return new Promise((resolve) => {
             if (this.loggedInUser) {
@@ -308,7 +275,7 @@ class Steam {
     }
 
     static async getShortcutFile() {
-        const steamPath = await this.getSteamPath();
+        const steamPath = await getSteamPath();
         const user = await this.getLoggedInUser();
 
         return new Promise((resolve) => {
