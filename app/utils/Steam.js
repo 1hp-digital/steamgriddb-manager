@@ -1,6 +1,7 @@
 import SteamID from "steamid";
 import { crc32 } from "crc";
 import getSteamPath from "./steam/getSteamPath";
+import getLoggedInUser from './steam/getLoggedInUser';
 
 const Store = window.require("electron-store");
 const fs = window.require("fs");
@@ -22,7 +23,7 @@ class Steam {
 
     static async getCurrentUserGridPath() {
         const steamPath = await getSteamPath();
-        const user = await this.getLoggedInUser();
+        const user = await getLoggedInUser();
 
         return new Promise((resolve) => {
             if (this.currentUserGridPath) {
@@ -276,7 +277,7 @@ class Steam {
 
     static async getShortcutFile() {
         const steamPath = await getSteamPath();
-        const user = await this.getLoggedInUser();
+        const user = await getLoggedInUser();
 
         return new Promise((resolve) => {
             const userdataPath = join(steamPath, "userdata", String(user));
@@ -395,7 +396,7 @@ class Steam {
     }
 
     static async checkIfSteamIsRunning() {
-        const user = await this.getLoggedInUser();
+        const user = await getLoggedInUser();
 
         return new Promise((resolve) => {
             const levelDBPath = this.getLevelDBPath();
@@ -420,7 +421,7 @@ class Steam {
     }
 
     static async addCategory(games, categoryId) {
-        const user = await this.getLoggedInUser();
+        const user = await getLoggedInUser();
         const userGridPath = await this.getCurrentUserGridPath();
 
         return new Promise((resolve, reject) => {
