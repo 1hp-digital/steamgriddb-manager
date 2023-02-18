@@ -1,7 +1,8 @@
 import SteamID from "steamid";
 import { crc32 } from "crc";
 import getSteamPath from "./steam/getSteamPath";
-import getLoggedInUser from './steam/getLoggedInUser';
+import getLoggedInUser from "./steam/getLoggedInUser";
+import getCurrentUserGridPath from "./steam/getCurrentUserGridPath";
 
 const Store = window.require("electron-store");
 const fs = window.require("fs");
@@ -19,23 +20,6 @@ class Steam {
     constructor() {
         this.loggedInUser = null;
         this.currentUserGridPath = null;
-    }
-
-    static async getCurrentUserGridPath() {
-        const steamPath = await getSteamPath();
-        const user = await getLoggedInUser();
-
-        return new Promise((resolve) => {
-            if (this.currentUserGridPath) {
-                return resolve(this.currentUserGridPath);
-            }
-            const gridPath = join(steamPath, "userdata", String(user), "config", "grid");
-            if (!fs.existsSync(gridPath)) {
-                fs.mkdirSync(gridPath);
-            }
-            this.currentUserGridPath = gridPath;
-            resolve(gridPath);
-        });
     }
 
     static async getGameImages(game) {
@@ -287,7 +271,7 @@ class Steam {
     }
 
     static async addAsset(type, appId, url) {
-        const userGridPath = await this.getCurrentUserGridPath();
+        const userGridPath = await getCurrentUserGridPath();
 
         return new Promise((resolve, reject) => {
             const imageUrl = url;
@@ -422,7 +406,7 @@ class Steam {
 
     static async addCategory(games, categoryId) {
         const user = await getLoggedInUser();
-        const userGridPath = await this.getCurrentUserGridPath();
+        const userGridPath = await getCurrentUserGridPath();
 
         return new Promise((resolve, reject) => {
             const levelDBPath = this.getLevelDBPath();
