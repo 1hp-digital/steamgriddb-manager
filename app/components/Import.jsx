@@ -9,6 +9,7 @@ import Spinner from "./Spinner";
 import Steam from "../utils/Steam";
 import platformModules from "../importers";
 import { getTheme } from "react-uwp/Theme";
+import generateNewAppId from '../utils/steam/generateNewAppId';
 
 const Store = window.require("electron-store");
 const steamGridDB = window.require("steamgriddb");
@@ -275,7 +276,7 @@ const Import = () => {
                     const downloadPromises = [];
 
                     games.forEach((game, i) => {
-                        const appId = Steam.generateNewAppId(game.exe, game.name);
+                        const appId = generateNewAppId(game.exe, game.name);
 
                         // Take (legacy) grids from when we got them for the ImportList
                         const savedGrid = platform.grids[platform.games.indexOf(games[i])];

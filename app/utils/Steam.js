@@ -3,6 +3,7 @@ import { crc32 } from "crc";
 import getSteamPath from "./steam/getSteamPath";
 import getLoggedInUser from "./steam/getLoggedInUser";
 import getCurrentUserGridPath from "./steam/getCurrentUserGridPath";
+import generateNewAppId from './steam/generateNewAppId';
 
 const Store = window.require("electron-store");
 const fs = window.require("fs");
@@ -83,8 +84,8 @@ class Steam {
                     const exe = item.exe || item.Exe;
                     const configId = metrohash64(exe + item.LaunchOptions);
                     const appid = (item.appid) ?
-                        (item.appid >>> 0) : //bitwise unsigned 32 bit ID of manually added non-steam game
-                        this.generateNewAppId(exe, appName);
+                        (item.appid >>> 0) : // bitwise unsigned 32 bit ID of manually added non-steam game
+                        generateNewAppId(exe, appName);
 
 
                     if (store.has(`games.${configId}`)) {
@@ -127,15 +128,6 @@ class Steam {
         const key = exe + name;
         const top = BigInt(crc32(key)) | BigInt(0x80000000);
         return String((BigInt(top) << BigInt(32) | BigInt(0x02000000)));
-    }
-
-    // Appid for new library.
-    // Thanks to https://gist.github.com/stormyninja/6295d5e6c1c9c19ab0ce46d546e6d0b1 & https://gitlab.com/avalonparton/grid-beautification
-    static generateNewAppId(exe, name) {
-        const key = exe + name;
-        const top = BigInt(crc32(key)) | BigInt(0x80000000);
-        const shift = (BigInt(top) << BigInt(32) | BigInt(0x02000000)) >> BigInt(32);
-        return parseInt(shift, 10);
     }
     /* eslint-enable no-bitwise, no-mixed-operators */
 
@@ -370,7 +362,7 @@ class Steam {
 
                 games.forEach((app) => {
                     const platformName = categoryId;
-                    const appId = this.generateNewAppId(app.exe, app.name);
+                    const appId = generateNewAppId(app.exe, app.name);
 
                     // Create new category if it doesn't exist
                     const catKey = `sgdb-${platformName}`; // just use the name as the id
