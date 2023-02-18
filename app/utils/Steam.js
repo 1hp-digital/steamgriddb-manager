@@ -62,60 +62,6 @@ class Steam {
         });
     }
 
-    static async getSteamGames() {
-        const steamPath = await getSteamPath();
-
-        return new Promise((resolve) => {
-            const parsedLibFolders = VDF.parse(fs.readFileSync(join(steamPath, "steamapps", "libraryfolders.vdf"), "utf-8"));
-            const games = [];
-
-            // Load extra library paths from libraryfolders.vdf
-            const extraLibraries = Object.entries(parsedLibFolders.LibraryFolders || parsedLibFolders.libraryfolders || {})
-                .filter(([key]) => !Number.isNaN(parseInt(key, 10)))
-            // eslint-disable-next-line no-unused-vars
-                .filter(([_, library]) => typeof library === "string" || library.mounted !== 0)
-            // eslint-disable-next-line no-unused-vars
-                .map(([_, library]) => typeof library === "string" ? library : library.path);
-
-            // Add Steam install dir and extra libraries
-            const libraries = [steamPath, ...extraLibraries];
-
-            log.info(`Found ${libraries.length} Steam libraries`);
-
-            libraries.forEach((library) => {
-                const appsPath = join(library, "steamapps");
-                const files = fs.readdirSync(appsPath);
-                files.forEach((file) => {
-                    const ext = file.split(".").pop();
-
-                    if (ext === "acf") {
-                        const filePath = join(appsPath, file);
-                        const data = fs.readFileSync(filePath, "utf-8");
-                        try {
-                            const gameData = VDF.parse(data);
-                            if (gameData.AppState.appid === 228980) {
-                                return;
-                            }
-
-                            const game = {
-                                appid: gameData.AppState.appid,
-                                name: gameData.AppState.name,
-                                type: "game",
-                            };
-
-                            games.push(game);
-                        } catch (err) {
-                            log.warn(`Error while parsing ${file}: ${err}`);
-                        }
-                    }
-                });
-            });
-            log.info(`Fetched ${games.length} Steam games`);
-
-            resolve(games);
-        });
-    }
-
     static async getNonSteamGames() {
         const steamPath = await getSteamPath();
         const user = await this.getLoggedInUser();
