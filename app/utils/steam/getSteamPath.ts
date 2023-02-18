@@ -1,8 +1,13 @@
 const Registry = window.require("winreg");
-const memoize = require("fast-memoize");
+
+let cache:string;
 
 const getSteamPath = ():Promise<string> => {
     return new Promise((resolve, reject) => {
+        if (cache) {
+            return resolve(cache);
+        }
+
         const key = new Registry({
             hive: Registry.HKCU,
             key: "\\Software\\Valve\\Steam",
@@ -12,6 +17,7 @@ const getSteamPath = ():Promise<string> => {
             const steamPath = items?.find((item) => item.name == "SteamPath")?.value;
 
             if (steamPath) {
+                cache = steamPath;
                 return resolve(steamPath);
             }
 
@@ -21,7 +27,4 @@ const getSteamPath = ():Promise<string> => {
     });
 };
 
-const getSteamPathMemo = memoize(getSteamPath);
-
-export {getSteamPath};
-export default getSteamPathMemo;
+export default getSteamPath;
