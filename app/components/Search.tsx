@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {ReactElement, useEffect, useState} from "react";
 import PropTypes from "prop-types";
 import {Redirect} from "react-router-dom";
 import Image from "react-uwp/Image";
@@ -11,7 +11,7 @@ import addAsset from "../utils/addAsset";
 
 const SteamGridDB = window.require("steamgriddb");
 
-const Search = (props) => {
+const Search = (props):ReactElement => {
     const {location} = props;
     console.log(SteamGridDB);
 
@@ -19,7 +19,7 @@ const Search = (props) => {
     const game = location.state;
 
     const [items, setItems] = useState([]);
-    const [redirect, setRedirect] = useState(false);
+    const [redirect, setRedirect] = useState<ReactElement|null>(null);
     const [isLoaded, setIsLoaded] = useState(false);
 
     const theme = getTheme();
@@ -51,7 +51,7 @@ const Search = (props) => {
         }
     }, []);
 
-    const onClick = (item, itemIndex) => {
+    const onClick = (item, itemIndex):void => {
         const clonedItems = [...items];
         clonedItems[itemIndex].downloading = true;
 
@@ -64,7 +64,7 @@ const Search = (props) => {
         });
     };
 
-    const queryApi = (type, id) => {
+    const queryApi = (type, id):void => {
         switch (location.state.assetType) {
             case "horizontalGrid":
                 SGDB.getGrids({type, id}).then((res) => {
@@ -124,7 +124,7 @@ const Search = (props) => {
                     <Button
                         key={item.id}
                         style={{padding: 0, margin: 5}}
-                        onClick={() => onClick(item, i)}
+                        onClick={():void => onClick(item, i)}
                     >
                         {item.downloading ? (
                             <div style={{position: "relative"}}>
