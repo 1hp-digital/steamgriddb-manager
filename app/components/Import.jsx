@@ -6,7 +6,6 @@ import {isEqual} from "lodash";
 import ImportList from "./ImportList";
 import ImportAllButton from "./ImportAllButton";
 import Spinner from "./Spinner";
-import Steam from "../utils/Steam";
 import platformModules from "../importers";
 import {getTheme} from "react-uwp/Theme";
 import generateNewAppId from "../utils/steam/generateNewAppId";
@@ -15,6 +14,7 @@ import checkIfSteamIsRunning from "../utils/steam/checkIfSteamIsRunning";
 import generateAppId from "../utils/steam/generateAppId";
 import addAsset from "../utils/steam/addAsset";
 import addShortcuts from "../utils/steam/addShortcuts";
+import addCategory from "../utils/steam/addShortcut";
 
 const Store = window.require("electron-store");
 const steamGridDB = window.require("steamgriddb");
@@ -223,7 +223,7 @@ const Import = () => {
         }));
 
         addShortcuts(shortcuts).then(() => {
-            Steam.addCategory(games, platform.name).then(() => {
+            addCategory(games, platform.name).then(() => {
                 PubSub.publish("toast", {
                     logoNode: "ImportAll",
                     title: "Successfully Imported!",

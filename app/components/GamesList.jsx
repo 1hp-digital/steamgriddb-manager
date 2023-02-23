@@ -10,7 +10,6 @@ import PubSub from "pubsub-js";
 import {debounce} from "lodash";
 import {forceCheck} from "react-lazyload";
 import Spinner from "./Spinner";
-import Steam from "../utils/Steam";
 import TopBlur from "./TopBlur";
 import GameListItem from "./GameListItem.tsx";
 import {getTheme} from "react-uwp/Theme";

@@ -6,7 +6,6 @@ import Button from "react-uwp/Button";
 import PubSub from "pubsub-js";
 import TopBlur from "./TopBlur";
 import Spinner from "./Spinner";
-import Steam from "../utils/Steam";
 import {getTheme} from "react-uwp/Theme";
 import addAsset from "../utils/steam/addAsset";
 
