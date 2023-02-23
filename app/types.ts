@@ -1,7 +1,9 @@
 export interface Game {
-    appid: string,
+    appid: number,
     name: string,
     type: string
+    platform?: string,
+    gameId?: string,
 }
 
 export interface ShortcutFile {

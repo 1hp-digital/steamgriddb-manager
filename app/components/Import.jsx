@@ -10,6 +10,7 @@ import Steam from "../utils/Steam";
 import platformModules from "../importers";
 import {getTheme} from "react-uwp/Theme";
 import generateNewAppId from "../utils/steam/generateNewAppId";
+import getNonSteamGames from "../utils/steam/getNonSteamGames";
 
 const Store = window.require("electron-store");
 const steamGridDB = window.require("steamgriddb");
@@ -58,7 +59,7 @@ const Import = () => {
     }, []);
 
     const getInstalledPlatforms = async () => {
-        const nonSteamGames = await Steam.getNonSteamGames();
+        const nonSteamGames = await getNonSteamGames();
 
         if (!isEqual(nonSteamGames, lastNonSteamGames)) {
             log.info("Getting installed games for import list");

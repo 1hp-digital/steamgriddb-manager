@@ -16,6 +16,7 @@ import GameListItem from "./GameListItem.tsx";
 import {getTheme} from "react-uwp/Theme";
 import getSteamPath from "../utils/steam/getSteamPath";
 import getSteamGames from "../utils/steam/getSteamGames";
+import getNonSteamGames from "../utils/steam/getNonSteamGames";
 
 const log = window.require("electron-log");
 
@@ -56,7 +57,7 @@ const GamesList = () => {
 
     const fetchGames = async () => {
         const steamGames = await getSteamGames();
-        const nonSteamGames = await Steam.getNonSteamGames();
+        const nonSteamGames = await getNonSteamGames();
         const items = {steam: steamGames, ...nonSteamGames};
 
         // Sort games alphabetically
