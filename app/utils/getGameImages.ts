@@ -4,7 +4,7 @@ const fs = window.require("fs");
 import getSteamPath from "./getSteamPath";
 import getCustomImage from "./getCustomImage";
 import getLoggedInUser from "./getLoggedInUser";
-import {GameImages} from "../../types";
+import {GameImages} from "../types";
 
 const getGameImages = async (game):Promise<GameImages> => {
     const steamPath = await getSteamPath();

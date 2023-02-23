@@ -11,7 +11,7 @@ import capsulePlaceholder from "../images/capsule_none.png";
 import logoPlaceholder from "../images/logo_none.png";
 import {getTheme} from "react-uwp/Theme";
 import Spinner from "./Spinner";
-import getGameImages from "../utils/steam/getGameImages";
+import getGameImages from "../utils/getGameImages";
 
 const Game = (props) => {
     const {location} = props;

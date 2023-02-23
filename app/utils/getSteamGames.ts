@@ -1,5 +1,5 @@
 import getSteamPath from "./getSteamPath";
-import {Game} from "../../types";
+import {Game} from "../types";
 
 const fs = window.require("fs");
 const {join} = window.require("path");

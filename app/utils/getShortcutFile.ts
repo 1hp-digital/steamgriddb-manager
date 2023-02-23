@@ -1,6 +1,6 @@
 import getSteamPath from "./getSteamPath";
 import getLoggedInUser from "./getLoggedInUser";
-import {ShortcutFile} from "../../types";
+import {ShortcutFile} from "../types";
 const {join} = window.require("path");
 
 const getShortcutFile = async ():Promise<ShortcutFile> => {

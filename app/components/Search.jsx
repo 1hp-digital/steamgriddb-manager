@@ -7,7 +7,7 @@ import PubSub from "pubsub-js";
 import TopBlur from "./TopBlur";
 import Spinner from "./Spinner";
 import {getTheme} from "react-uwp/Theme";
-import addAsset from "../utils/steam/addAsset";
+import addAsset from "../utils/addAsset";
 
 const SteamGridDB = window.require("steamgriddb");
 

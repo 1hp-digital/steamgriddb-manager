@@ -1,6 +1,6 @@
 import getShortcutFile from "./getShortcutFile";
 import generateNewAppId from "./generateNewAppId";
-import {Game} from "../../types";
+import {Game} from "../types";
 
 const shortcut = window.require("steam-shortcut-editor");
 const {metrohash64} = window.require("metrohash");

@@ -13,9 +13,9 @@ import Spinner from "./Spinner";
 import TopBlur from "./TopBlur";
 import GameListItem from "./GameListItem.tsx";
 import {getTheme} from "react-uwp/Theme";
-import getSteamPath from "../utils/steam/getSteamPath";
-import getSteamGames from "../utils/steam/getSteamGames";
-import getNonSteamGames from "../utils/steam/getNonSteamGames";
+import getSteamPath from "../utils/getSteamPath";
+import getSteamGames from "../utils/getSteamGames";
+import getNonSteamGames from "../utils/getNonSteamGames";
 
 const log = window.require("electron-log");
 
