@@ -17,3 +17,7 @@ export interface GameImages {
     logo: string|boolean,
     poster: string|boolean
 }
+
+export interface GamesList {
+    [key: string]: Game[]
+}

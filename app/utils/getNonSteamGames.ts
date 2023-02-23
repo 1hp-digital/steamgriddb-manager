@@ -1,16 +1,12 @@
 import getShortcutFile from "./getShortcutFile";
 import generateNewAppId from "./generateNewAppId";
-import {Game} from "../types";
+import {GamesList} from "../types";
 
 const shortcut = window.require("steam-shortcut-editor");
 const {metrohash64} = window.require("metrohash");
 const Store = window.require("electron-store");
 
-export interface NonSteamGames {
-    [key: string]: Game[];
-}
-
-const getNonSteamGames = async ():Promise<NonSteamGames> => {
+const getNonSteamGames = async ():Promise<GamesList> => {
     const shortcutPath = await getShortcutFile();
 
     return new Promise((resolve) => {
@@ -18,7 +14,7 @@ const getNonSteamGames = async ():Promise<NonSteamGames> => {
 
         const processed = [];
         shortcut.parseFile(shortcutPath, (err, items) => {
-            const games:NonSteamGames = {};
+            const games:GamesList = {};
 
             if (!items) {
                 return resolve(games);

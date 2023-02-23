@@ -1,5 +1,4 @@
-import React, {useEffect, useState} from "react";
-import PropTypes from "prop-types";
+import React, {ReactElement, useEffect, useState} from "react";
 import {Redirect} from "react-router-dom";
 import AutoSuggestBox from "react-uwp/AutoSuggestBox";
 import AppBarButton from "react-uwp/AppBarButton";
@@ -11,15 +10,16 @@ import {debounce} from "lodash";
 import {forceCheck} from "react-lazyload";
 import Spinner from "./Spinner";
 import TopBlur from "./TopBlur";
-import GameListItem from "./GameListItem.tsx";
+import GameListItem from "./GameListItem";
 import {getTheme} from "react-uwp/Theme";
 import getSteamPath from "../utils/getSteamPath";
 import getSteamGames from "../utils/getSteamGames";
 import getNonSteamGames from "../utils/getNonSteamGames";
+import {GamesList} from "../types";
 
 const log = window.require("electron-log");
 
-const GamesList = () => {
+const GamesList = ():ReactElement => {
     const searchInput = debounce((searchTerm) => {
         filterGames(searchTerm);
     }, 300);
@@ -31,16 +31,16 @@ const GamesList = () => {
 
     const [fetchedGames, setFetchedGames] = useState({});
     const [isLoaded, setIsLoaded] = useState(false);
-    const [redirect, setRedirect] = useState(false);
+    const [redirect, setRedirect] = useState<ReactElement|null>(null);
     const [hasSteam, setHasSteam] = useState(true);
-    const [items, setItems] = useState({});
+    const [items, setItems] = useState<GamesList>({});
 
     const theme = getTheme();
 
     useEffect(() => {
         PubSub.publish("showBack", false);
 
-        const fetchData = async () => {
+        const fetchData = async ():Promise<void> => {
             const steamPath = await getSteamPath();
 
             if (!steamPath) {
@@ -48,13 +48,13 @@ const GamesList = () => {
                 setHasSteam(false);
             }
 
-            fetchGames();
+            await fetchGames();
         };
 
-        fetchData();
+        void fetchData();
     }, []);
 
-    const fetchGames = async () => {
+    const fetchGames = async ():Promise<void> => {
         const steamGames = await getSteamGames();
         const nonSteamGames = await getNonSteamGames();
         const items = {steam: steamGames, ...nonSteamGames};
@@ -76,17 +76,17 @@ const GamesList = () => {
         setItems(items);
     };
 
-    const toGame = (platform, index) => {
+    const toGame = (platform, index):void => {
         const data = items[platform][index];
         setRedirect(<Redirect to={{pathname: "/game", state: data}} />);
     };
 
-    const refreshGames = () => {
+    const refreshGames = ():void => {
         setIsLoaded(false);
         fetchGames();
     };
 
-    const filterGames = (searchTerm) => {
+    const filterGames = (searchTerm):void => {
         const items = {...fetchedGames};
 
         if (searchTerm.trim() === "") {
@@ -158,8 +158,7 @@ const GamesList = () => {
                         platform={platform}
                         platformName={platformNames[platform]}
                         listSource={[
-                            // eslint-disable-next-line react/no-unknown-property
-                            ...items[platform].map((item) => <p key={item.appid} id={`game-${item.appid}`} game={item}>{item.name}</p>),
+                            ...items[platform].map((item) => <p key={item.appid} id={`game-${item.appid}`}>{item.name}</p>),
                             <Separator key={i} disabled />,
                         ]}
                         onItemClick={toGame}
@@ -170,5 +169,4 @@ const GamesList = () => {
     );
 };
 
-GamesList.contextTypes = {theme: PropTypes.object};
 export default GamesList;
