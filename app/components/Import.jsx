@@ -13,6 +13,7 @@ import generateNewAppId from "../utils/steam/generateNewAppId";
 import getNonSteamGames from "../utils/steam/getNonSteamGames";
 import checkIfSteamIsRunning from "../utils/steam/checkIfSteamIsRunning";
 import generateAppId from "../utils/steam/generateAppId";
+import addAsset from "../utils/steam/addAsset";
 
 const Store = window.require("electron-store");
 const steamGridDB = window.require("steamgriddb");
@@ -287,25 +288,25 @@ const Import = () => {
                         if (platform.grids[i] && savedGrid) {
                             const appIdOld = generateAppId(game.exe, game.name);
 
-                            downloadPromises.push(Steam.addAsset("horizontalGrid", appId, savedGrid.url));
+                            downloadPromises.push(addAsset("horizontalGrid", appId, savedGrid.url));
 
                             // Old app id is for Big Picture Mode
-                            downloadPromises.push(Steam.addAsset("horizontalGrid", appIdOld, savedGrid.url));
+                            downloadPromises.push(addAsset("horizontalGrid", appIdOld, savedGrid.url));
                         }
 
                         // Download posters
                         if (posters[i]) {
-                            downloadPromises.push(Steam.addAsset("verticalGrid", appId, posters[i].url));
+                            downloadPromises.push(addAsset("verticalGrid", appId, posters[i].url));
                         }
 
                         // Download heroes
                         if (heroes[i]) {
-                            downloadPromises.push(Steam.addAsset("hero", appId, heroes[i].url));
+                            downloadPromises.push(addAsset("hero", appId, heroes[i].url));
                         }
 
                         // Download logos
                         if (heroes[i]) {
-                            downloadPromises.push(Steam.addAsset("logo", appId, logos[i].url));
+                            downloadPromises.push(addAsset("logo", appId, logos[i].url));
                         }
                     });
 

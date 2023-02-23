@@ -8,6 +8,7 @@ import TopBlur from "./TopBlur";
 import Spinner from "./Spinner";
 import Steam from "../utils/Steam";
 import {getTheme} from "react-uwp/Theme";
+import addAsset from "../utils/steam/addAsset";
 
 const SteamGridDB = window.require("steamgriddb");
 
@@ -57,7 +58,7 @@ const Search = (props) => {
 
         setItems(clonedItems);
 
-        Steam.addAsset(location.state.assetType, game.appid, item.url).then(() => {
+        addAsset(location.state.assetType, game.appid, item.url).then(() => {
             clonedItems[itemIndex].downloading = false;
             setItems(clonedItems);
             setRedirect(<Redirect to={{pathname: "/game", state: location.state}} />);
