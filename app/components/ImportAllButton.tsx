@@ -1,11 +1,11 @@
-import React from "react";
+import React, {ReactElement} from "react";
 import Button from "react-uwp/Button";
 import PropTypes from "prop-types";
 
-const ImportAllButton = (props) => {
+const ImportAllButton = (props):ReactElement => {
     const {onButtonClick, games, platform, steamIsRunning} = props;
 
-    const handleClick = () => {
+    const handleClick = ():void => {
         onButtonClick(games, platform);
     };
 
@@ -28,7 +28,7 @@ ImportAllButton.propTypes = {
 };
 
 ImportAllButton.defaultProps = {
-    onButtonClick: () => {},
+    onButtonClick: ():void => {},
     steamIsRunning: false,
 };
 
