@@ -5,6 +5,7 @@ import getLoggedInUser from "./steam/getLoggedInUser";
 import getCurrentUserGridPath from "./steam/getCurrentUserGridPath";
 import generateNewAppId from "./steam/generateNewAppId";
 import getShortcutFile from "./steam/getShortcutFile";
+import getLeveldbPath from "./steam/getLeveldbPath";
 
 const fs = window.require("fs");
 const {join, extname} = window.require("path");
@@ -241,15 +242,11 @@ class Steam {
         });
     }
 
-    static getLevelDBPath() {
-        return join(process.env.localappdata, "Steam", "htmlcache", "Local Storage", "leveldb");
-    }
-
     static async checkIfSteamIsRunning() {
         const user = await getLoggedInUser();
 
         return new Promise((resolve) => {
-            const levelDBPath = this.getLevelDBPath();
+            const levelDBPath = getLeveldbPath();
             const cats = new Categories(levelDBPath, String(user));
 
             /*
@@ -275,7 +272,7 @@ class Steam {
         const userGridPath = await getCurrentUserGridPath();
 
         return new Promise((resolve, reject) => {
-            const levelDBPath = this.getLevelDBPath();
+            const levelDBPath = getLeveldbPath();
 
             const cats = new Categories(levelDBPath, String(user));
 
