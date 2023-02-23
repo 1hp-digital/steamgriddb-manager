@@ -32,10 +32,6 @@ class Steam {
     }
     /* eslint-enable no-bitwise, no-mixed-operators */
 
-    static getDefaultGridImage(appid) {
-        return `https://steamcdn-a.akamaihd.net/steam/apps/${appid}/header.jpg`;
-    }
-
     static async addAsset(type, appId, url) {
         const userGridPath = await getCurrentUserGridPath();
 
