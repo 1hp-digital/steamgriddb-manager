@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from "react";
+// @ts-nocheck
+import React, {ReactElement, useEffect, useState} from "react";
 import PropTypes from "prop-types";
 import PubSub from "pubsub-js";
 import {Icon} from "react-uwp";
@@ -15,13 +16,14 @@ import generateAppId from "../utils/generateAppId";
 import addAsset from "../utils/addAsset";
 import addShortcuts from "../utils/addShortcuts";
 import addCategory from "../utils/addShortcut";
+import {SteamGridDBImageData} from "../types";
 
 const Store = window.require("electron-store");
 const steamGridDB = window.require("steamgriddb");
 const {metrohash64} = window.require("metrohash");
 const log = window.require("electron-log");
 
-const Import = () => {
+const Import = ():ReactElement => {
     const store = new Store();
     let checkSteamInterval = null;
 
@@ -48,13 +50,13 @@ const Import = () => {
 
     const theme = getTheme();
 
-    useEffect(async () => {
+    useEffect(() => {
         log.info("Opened Import Page");
 
-        await updateSteamIsRunning();
+        void updateSteamIsRunning();
         checkSteamInterval = setInterval(updateSteamIsRunning, 2000);
 
-        await getInstalledPlatforms();
+        void getInstalledPlatforms();
 
         // returned function will be called on component unmount
         return () => {
@@ -62,7 +64,7 @@ const Import = () => {
         };
     }, []);
 
-    const getInstalledPlatforms = async () => {
+    const getInstalledPlatforms = async ():Promise<void> => {
         const nonSteamGames = await getNonSteamGames();
 
         if (!isEqual(nonSteamGames, lastNonSteamGames)) {
@@ -153,7 +155,7 @@ const Import = () => {
    * @todo We might want to put this at the App level, and publish changes via PubSub or props,
    *   so different pages can display their own message if Steam is running.
    */
-    const updateSteamIsRunning = async () => {
+    const updateSteamIsRunning = async ():Promise<void> => {
         const steamIsRunning = await checkIfSteamIsRunning();
 
         if (steamIsRunning !== steamIsRunning) {
@@ -170,7 +172,7 @@ const Import = () => {
         }
     };
 
-    const saveImportedGames = (games) => {
+    const saveImportedGames = (games):void => {
         const gamesStorage = store.get("games", {});
 
         games.forEach((game) => {
@@ -188,8 +190,10 @@ const Import = () => {
     };
 
     // @todo this is horrible but can't be arsed right now
-    const _formatResponse = (ids, res) => {
+    const _formatResponse = (ids, res):SteamGridDBImageData[] => {
         let formatted = false;
+
+        console.log("res", res);
 
         // if only single id then return first grid
         if (ids.length === 1) {
@@ -207,10 +211,12 @@ const Import = () => {
                 return false;
             });
         }
+
+        console.log("formatted: ", formatted);
         return formatted;
     };
 
-    const addGames = (games, platform) => {
+    const addGames = (games, platform):void => {
         saveImportedGames(games);
 
         const shortcuts = games.map((game) => ({
@@ -338,10 +344,9 @@ const Import = () => {
         });
     };
 
-    const addGame = (game, platform) => {
+    const addGame = (game, platform):void => {
         return addGames([game], platform);
     };
-
 
     if (!isLoaded) {
         return (<Spinner text={loadingText} />);
