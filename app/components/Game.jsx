@@ -12,6 +12,7 @@ import capsulePlaceholder from "../images/capsule_none.png";
 import logoPlaceholder from "../images/logo_none.png";
 import {getTheme} from "react-uwp/Theme";
 import Spinner from "./Spinner";
+import getGameImages from "../utils/steam/getGameImages";
 
 const Game = (props) => {
     const {location} = props;
@@ -30,7 +31,7 @@ const Game = (props) => {
         PubSub.publish("showBack", true);
 
         const fetchData = async () => {
-            const images = await Steam.getGameImages(game);
+            const images = await getGameImages(game);
 
             setGrid(images.grid);
             setPoster(images.poster);

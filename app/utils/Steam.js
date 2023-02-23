@@ -24,46 +24,6 @@ class Steam {
         this.currentUserGridPath = null;
     }
 
-    static async getGameImages(game) {
-        const steamPath = await getSteamPath();
-        const user = await this.getLoggedInUser();
-
-        return new Promise((resolve) => {
-            const userdataGridPath = join(steamPath, "userdata", String(user), "config", "grid");
-
-            let grid = getCustomImage("horizontalGrid", userdataGridPath, game.appid);
-            let poster = getCustomImage("verticalGrid", userdataGridPath, game.appid);
-            let hero = getCustomImage("hero", userdataGridPath, game.appid);
-            let logo = getCustomImage("logo", userdataGridPath, game.appid);
-
-            // Find defaults from the cache if it doesn't exist
-            const librarycachePath = join(steamPath, "appcache", "librarycache");
-
-            if (!grid && fs.existsSync(join(librarycachePath, `${game.appid}_header.jpg`))) {
-                grid = join(librarycachePath, `${game.appid}_header.jpg`);
-            }
-
-            if (!poster && fs.existsSync(join(librarycachePath, `${game.appid}_library_600x900.jpg`))) {
-                poster = join(librarycachePath, `${game.appid}_library_600x900.jpg`);
-            }
-
-            if (!hero && fs.existsSync(join(librarycachePath, `${game.appid}_library_hero.jpg`))) {
-                hero = join(librarycachePath, `${game.appid}_library_hero.jpg`);
-            }
-
-            if (!logo && fs.existsSync(join(librarycachePath, `${game.appid}_logo.png`))) {
-                logo = join(librarycachePath, `${game.appid}_logo.png`);
-            }
-
-            resolve({
-                grid,
-                poster,
-                hero,
-                logo,
-            });
-        });
-    }
-
     /* eslint-disable no-bitwise, no-mixed-operators */
     static generateAppId(exe, name) {
         const key = exe + name;
@@ -71,33 +31,6 @@ class Steam {
         return String((BigInt(top) << BigInt(32) | BigInt(0x02000000)));
     }
     /* eslint-enable no-bitwise, no-mixed-operators */
-
-    static async getLoggedInUser() {
-        const steamPath = await getSteamPath();
-
-        return new Promise((resolve) => {
-            if (this.loggedInUser) {
-                return resolve(this.loggedInUser);
-            }
-
-            const loginusersPath = join(steamPath, "config", "loginusers.vdf");
-            const data = fs.readFileSync(loginusersPath, "utf-8");
-            const loginusersData = VDF.parse(data);
-
-            Object.keys(loginusersData.users).forEach((user) => {
-                if (loginusersData.users[user].MostRecent || loginusersData.users[user].mostrecent) {
-                    const {accountid} = (new SteamID(user));
-                    this.loggedInUser = accountid;
-                    log.info(`Got Steam user: ${accountid}`);
-                    resolve(accountid);
-                    return true;
-                }
-                return false;
-            });
-
-            return false;
-        });
-    }
 
     static getDefaultGridImage(appid) {
         return `https://steamcdn-a.akamaihd.net/steam/apps/${appid}/header.jpg`;
