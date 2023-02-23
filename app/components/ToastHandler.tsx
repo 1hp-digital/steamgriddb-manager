@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, {ReactElement, useEffect, useState} from "react";
 import PubSub from "pubsub-js";
 import Toast from "react-uwp/Toast";
 import Icon from "react-uwp/Icon";
 
-const ToastHandler = () => {
+const ToastHandler = ():ReactElement => {
     const [toasts, setToasts] = useState([]);
 
     useEffect(() => {
@@ -15,11 +15,11 @@ const ToastHandler = () => {
 
     }, []);
 
-    const close = (toast, closeDelay) => {
+    const close = (toast, closeDelay):void => {
         setTimeout(() => {
-            const toasts = toasts.slice(0);
-            toasts[toasts.indexOf(toast)].show = false;
-            setToasts(toasts);
+            const newToasts = toasts.slice(0);
+            newToasts[newToasts.indexOf(toast)].show = false;
+            setToasts(newToasts);
         }, closeDelay);
     };
 
