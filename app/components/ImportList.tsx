@@ -1,9 +1,9 @@
-import React from "react";
+import React, {CSSProperties, ReactElement} from "react";
 import ListView from "react-uwp/ListView";
 import PropTypes from "prop-types";
 import ImportListItem from "./ImportListItem";
 
-const ImportList = (props) => {
+const ImportList = (props):ReactElement => {
     const {
         onImportClick,
         games,
@@ -12,7 +12,7 @@ const ImportList = (props) => {
         steamIsRunning
     } = props;
 
-    const listStyle = {
+    const listStyle:CSSProperties = {
         background: "none",
         border: 0,
         width: "100%",
@@ -66,7 +66,7 @@ ImportList.propTypes = {
 };
 
 ImportList.defaultProps = {
-    onImportClick: () => {},
+    onImportClick: ():void => {},
     steamIsRunning: false,
 };
 export default ImportList;
