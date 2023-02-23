@@ -12,6 +12,7 @@ import {getTheme} from "react-uwp/Theme";
 import generateNewAppId from "../utils/steam/generateNewAppId";
 import getNonSteamGames from "../utils/steam/getNonSteamGames";
 import checkIfSteamIsRunning from "../utils/steam/checkIfSteamIsRunning";
+import generateAppId from "../utils/steam/generateAppId";
 
 const Store = window.require("electron-store");
 const steamGridDB = window.require("steamgriddb");
@@ -284,7 +285,7 @@ const Import = () => {
                         const savedGrid = platform.grids[platform.games.indexOf(games[i])];
 
                         if (platform.grids[i] && savedGrid) {
-                            const appIdOld = Steam.generateAppId(game.exe, game.name);
+                            const appIdOld = generateAppId(game.exe, game.name);
 
                             downloadPromises.push(Steam.addAsset("horizontalGrid", appId, savedGrid.url));
 

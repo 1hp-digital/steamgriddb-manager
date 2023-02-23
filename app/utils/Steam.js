@@ -1,12 +1,9 @@
-import SteamID from "steamid";
-import {crc32} from "crc";
-import getSteamPath from "./steam/getSteamPath";
 import getLoggedInUser from "./steam/getLoggedInUser";
 import getCurrentUserGridPath from "./steam/getCurrentUserGridPath";
 import generateNewAppId from "./steam/generateNewAppId";
 import getShortcutFile from "./steam/getShortcutFile";
 import getLeveldbPath from "./steam/getLeveldbPath";
-import getCustomImage from "./steam/getCustomImage";
+import generateAppId from "./steam/generateAppId";
 
 const fs = window.require("fs");
 const {join, extname} = window.require("path");
@@ -24,13 +21,7 @@ class Steam {
         this.currentUserGridPath = null;
     }
 
-    /* eslint-disable no-bitwise, no-mixed-operators */
-    static generateAppId(exe, name) {
-        const key = exe + name;
-        const top = BigInt(crc32(key)) | BigInt(0x80000000);
-        return String((BigInt(top) << BigInt(32) | BigInt(0x02000000)));
-    }
-    /* eslint-enable no-bitwise, no-mixed-operators */
+
 
     static async addAsset(type, appId, url) {
         const userGridPath = await getCurrentUserGridPath();
@@ -109,8 +100,8 @@ class Steam {
                 shortcuts.forEach((value) => {
                     // Don't add dupes
                     apps.some((app) => {
-                        const appid = this.generateAppId(app.exe, app.appname);
-                        if (this.generateAppId(value.exe, value.name) === appid) {
+                        const appid = generateAppId(app.exe, app.appname);
+                        if (generateAppId(value.exe, value.name) === appid) {
                             return true;
                         }
                         return false;
