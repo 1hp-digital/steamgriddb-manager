@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {ReactElement, useEffect, useState} from "react";
 import PropTypes from "prop-types";
 import {Redirect} from "react-router-dom";
 import Image from "react-uwp/Image";
@@ -12,16 +12,17 @@ import logoPlaceholder from "../images/logo_none.png";
 import {getTheme} from "react-uwp/Theme";
 import Spinner from "./Spinner";
 import getGameImages from "../utils/getGameImages";
+import {GameImages} from "../types";
 
-const Game = (props) => {
+const Game = (props):ReactElement => {
     const {location} = props;
     const game = location.state;
 
-    const [grid, setGrid] = useState();
-    const [poster, setPoster] = useState();
-    const [hero, setHero] = useState();
-    const [logo, setLogo] = useState();
-    const [redirect, setRedirect] = useState();
+    const [grid, setGrid] = useState<string|boolean>();
+    const [poster, setPoster] = useState<string|boolean>();
+    const [hero, setHero] = useState<string|boolean>();
+    const [logo, setLogo] = useState<string|boolean>();
+    const [redirect, setRedirect] = useState<ReactElement>();
     const [isLoaded, setIsLoaded] = useState(false);
 
     const theme = getTheme();
@@ -29,8 +30,8 @@ const Game = (props) => {
     useEffect(() => {
         PubSub.publish("showBack", true);
 
-        const fetchData = async () => {
-            const images = await getGameImages(game);
+        const fetchData = async ():Promise<void> => {
+            const images:GameImages = await getGameImages(game);
 
             setGrid(images.grid);
             setPoster(images.poster);
@@ -42,11 +43,11 @@ const Game = (props) => {
         fetchData();
     }, []);
 
-    const toSearch = (assetType) => {
+    const toSearch = (assetType):void => {
         setRedirect(<Redirect to={{pathname: "/search", state: {...location.state, assetType}}} />);
     };
 
-    const addNoCache = (imageURI) => {
+    const addNoCache = (imageURI):string|boolean => {
         if (!imageURI) {
             return false;
         }
@@ -86,7 +87,7 @@ const Game = (props) => {
             >
                 <h1 style={theme.typographyStyles.header}>{game.name}</h1>
                 <h5 style={titleStyle}>Hero</h5>
-                <Button style={buttonStyle} onClick={() => toSearch("hero")}>
+                <Button style={buttonStyle} onClick={():void => toSearch("hero")}>
                     <Image
                         style={{
                             width: "100%",
@@ -99,7 +100,7 @@ const Game = (props) => {
                 <div style={{display: "flex"}}>
                     <div style={{flex: 1}}>
                         <h5 style={titleStyle}>Vertical Capsule</h5>
-                        <Button style={buttonStyle} onClick={() => toSearch("verticalGrid")}>
+                        <Button style={buttonStyle} onClick={():void => toSearch("verticalGrid")}>
                             <Image
                                 style={{
                                     maxWidth: "100%",
@@ -116,7 +117,7 @@ const Game = (props) => {
                         }}
                     >
                         <h5 style={titleStyle}>Horizontal Capsule</h5>
-                        <Button style={buttonStyle} onClick={() => toSearch("horizontalGrid")}>
+                        <Button style={buttonStyle} onClick={():void => toSearch("horizontalGrid")}>
                             <Image
                                 style={{
                                     maxWidth: "100%",
@@ -129,7 +130,7 @@ const Game = (props) => {
                 </div>
                 <div>
                     <h5 style={titleStyle}>Logo</h5>
-                    <Button style={buttonStyle} onClick={() => toSearch("logo")}>
+                    <Button style={buttonStyle} onClick={():void => toSearch("logo")}>
                         <Image
                             style={{
                                 maxWidth: "100%",
