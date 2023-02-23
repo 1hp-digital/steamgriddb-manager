@@ -11,6 +11,7 @@ import platformModules from "../importers";
 import {getTheme} from "react-uwp/Theme";
 import generateNewAppId from "../utils/steam/generateNewAppId";
 import getNonSteamGames from "../utils/steam/getNonSteamGames";
+import checkIfSteamIsRunning from "../utils/steam/checkIfSteamIsRunning";
 
 const Store = window.require("electron-store");
 const steamGridDB = window.require("steamgriddb");
@@ -47,8 +48,8 @@ const Import = () => {
     useEffect(async () => {
         log.info("Opened Import Page");
 
-        await checkIfSteamIsRunning();
-        checkSteamInterval = setInterval(checkIfSteamIsRunning, 2000);
+        await updateSteamIsRunning();
+        checkSteamInterval = setInterval(updateSteamIsRunning, 2000);
 
         await getInstalledPlatforms();
 
@@ -149,8 +150,8 @@ const Import = () => {
    * @todo We might want to put this at the App level, and publish changes via PubSub or props,
    *   so different pages can display their own message if Steam is running.
    */
-    const checkIfSteamIsRunning = async () => {
-        const steamIsRunning = await Steam.checkIfSteamIsRunning();
+    const updateSteamIsRunning = async () => {
+        const steamIsRunning = await checkIfSteamIsRunning();
 
         if (steamIsRunning !== steamIsRunning) {
             log.info(`Steam is ${steamIsRunning ? "open" : "closed"}`);
