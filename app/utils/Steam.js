@@ -1,14 +1,11 @@
 import getLoggedInUser from "./steam/getLoggedInUser";
 import getCurrentUserGridPath from "./steam/getCurrentUserGridPath";
 import generateNewAppId from "./steam/generateNewAppId";
-import getShortcutFile from "./steam/getShortcutFile";
 import getLeveldbPath from "./steam/getLeveldbPath";
-import generateAppId from "./steam/generateAppId";
 
 const fs = window.require("fs");
 const {join} = window.require("path");
 const VDF = window.require("@node-steam/vdf");
-const shortcut = window.require("steam-shortcut-editor");
 const log = window.require("electron-log");
 const Categories = window.require("steam-categories");
 
@@ -16,51 +13,6 @@ class Steam {
     constructor() {
         this.loggedInUser = null;
         this.currentUserGridPath = null;
-    }
-
-    static async addShortcuts(shortcuts) {
-        const shortcutPath = await getShortcutFile();
-
-        return new Promise((resolve) => {
-            shortcut.parseFile(shortcutPath, (err, items) => {
-                const newShorcuts = {
-                    shortcuts: [],
-                };
-
-                let apps = [];
-                if (typeof items !== "undefined") {
-                    apps = items.shortcuts;
-                }
-
-                shortcuts.forEach((value) => {
-                    // Don't add dupes
-                    apps.some((app) => {
-                        const appid = generateAppId(app.exe, app.appname);
-                        if (generateAppId(value.exe, value.name) === appid) {
-                            return true;
-                        }
-                        return false;
-                    });
-
-                    apps.push({
-                        appname: value.name,
-                        exe: value.exe,
-                        StartDir: value.startIn,
-                        LaunchOptions: value.params,
-                        icon: (typeof value.icon !== "undefined" ? value.icon : ""),
-                        IsHidden: false,
-                        ShortcutPath: "",
-                        AllowDesktopConfig: true,
-                        OpenVR: false,
-                        tags: (typeof value.tags !== "undefined" ? value.tags : []),
-                    });
-                });
-
-                newShorcuts.shortcuts = apps;
-
-                shortcut.writeFile(shortcutPath, newShorcuts, () => resolve());
-            });
-        });
     }
 
     static async addCategory(games, categoryId) {

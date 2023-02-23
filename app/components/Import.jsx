@@ -14,6 +14,7 @@ import getNonSteamGames from "../utils/steam/getNonSteamGames";
 import checkIfSteamIsRunning from "../utils/steam/checkIfSteamIsRunning";
 import generateAppId from "../utils/steam/generateAppId";
 import addAsset from "../utils/steam/addAsset";
+import addShortcuts from "../utils/steam/addShortcuts";
 
 const Store = window.require("electron-store");
 const steamGridDB = window.require("steamgriddb");
@@ -221,7 +222,7 @@ const Import = () => {
             icon: game.icon,
         }));
 
-        Steam.addShortcuts(shortcuts).then(() => {
+        addShortcuts(shortcuts).then(() => {
             Steam.addCategory(games, platform.name).then(() => {
                 PubSub.publish("toast", {
                     logoNode: "ImportAll",
