@@ -3,7 +3,8 @@ import { crc32 } from "crc";
 import getSteamPath from "./steam/getSteamPath";
 import getLoggedInUser from "./steam/getLoggedInUser";
 import getCurrentUserGridPath from "./steam/getCurrentUserGridPath";
-import generateNewAppId from './steam/generateNewAppId';
+import generateNewAppId from "./steam/generateNewAppId";
+import getShortcutFile from "./steam/getShortcutFile";
 
 const Store = window.require("electron-store");
 const fs = window.require("fs");
@@ -64,13 +65,11 @@ class Steam {
     }
 
     static async getNonSteamGames() {
-        const steamPath = await getSteamPath();
-        const user = await this.getLoggedInUser();
+        const shortcutPath = await getShortcutFile();
 
         return new Promise((resolve) => {
             const store = new Store();
-            const userdataPath = join(steamPath, "userdata", String(user));
-            const shortcutPath = join(userdataPath, "config", "shortcuts.vdf");
+
             const processed = [];
             shortcut.parseFile(shortcutPath, (err, items) => {
                 const games = {};
@@ -197,17 +196,6 @@ class Steam {
         return image;
     }
 
-    static async getShortcutFile() {
-        const steamPath = await getSteamPath();
-        const user = await getLoggedInUser();
-
-        return new Promise((resolve) => {
-            const userdataPath = join(steamPath, "userdata", String(user));
-            const shortcutPath = join(userdataPath, "config", "shortcuts.vdf");
-            resolve(shortcutPath);
-        });
-    }
-
     static async addAsset(type, appId, url) {
         const userGridPath = await getCurrentUserGridPath();
 
@@ -269,7 +257,7 @@ class Steam {
     }
 
     static async addShortcuts(shortcuts) {
-        const shortcutPath = await this.getShortcutFile();
+        const shortcutPath = await getShortcutFile();
 
         return new Promise((resolve) => {
             shortcut.parseFile(shortcutPath, (err, items) => {
