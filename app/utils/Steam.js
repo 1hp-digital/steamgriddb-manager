@@ -6,6 +6,7 @@ import getCurrentUserGridPath from "./steam/getCurrentUserGridPath";
 import generateNewAppId from "./steam/generateNewAppId";
 import getShortcutFile from "./steam/getShortcutFile";
 import getLeveldbPath from "./steam/getLeveldbPath";
+import getCustomImage from "./steam/getCustomImage";
 
 const fs = window.require("fs");
 const {join, extname} = window.require("path");
@@ -30,10 +31,10 @@ class Steam {
         return new Promise((resolve) => {
             const userdataGridPath = join(steamPath, "userdata", String(user), "config", "grid");
 
-            let grid = Steam.getCustomImage("horizontalGrid", userdataGridPath, game.appid);
-            let poster = Steam.getCustomImage("verticalGrid", userdataGridPath, game.appid);
-            let hero = Steam.getCustomImage("hero", userdataGridPath, game.appid);
-            let logo = Steam.getCustomImage("logo", userdataGridPath, game.appid);
+            let grid = getCustomImage("horizontalGrid", userdataGridPath, game.appid);
+            let poster = getCustomImage("verticalGrid", userdataGridPath, game.appid);
+            let hero = getCustomImage("hero", userdataGridPath, game.appid);
+            let logo = getCustomImage("logo", userdataGridPath, game.appid);
 
             // Find defaults from the cache if it doesn't exist
             const librarycachePath = join(steamPath, "appcache", "librarycache");
@@ -100,41 +101,6 @@ class Steam {
 
     static getDefaultGridImage(appid) {
         return `https://steamcdn-a.akamaihd.net/steam/apps/${appid}/header.jpg`;
-    }
-
-    static getCustomImage(type, userdataGridPath, appid) {
-        const fileTypes = ["png", "jpg", "jpeg", "tga"];
-
-        let basePath;
-        switch (type) {
-            case "horizontalGrid":
-                basePath = join(userdataGridPath, `${String(appid)}`);
-                break;
-            case "verticalGrid":
-                basePath = join(userdataGridPath, `${String(appid)}p`);
-                break;
-            case "hero":
-                basePath = join(userdataGridPath, `${String(appid)}_hero`);
-                break;
-            case "logo":
-                basePath = join(userdataGridPath, `${String(appid)}_logo`);
-                break;
-            default:
-                basePath = join(userdataGridPath, `${String(appid)}`);
-        }
-
-        let image = false;
-        fileTypes.some((ext) => {
-            const path = `${basePath}.${ext}`;
-
-            if (fs.existsSync(path)) {
-                image = path;
-                return true;
-            }
-            return false;
-        });
-
-        return image;
     }
 
     static async addAsset(type, appId, url) {
