@@ -1,9 +1,9 @@
-import React from "react";
+import React, {ReactElement} from "react";
 import PropTypes from "prop-types";
 import {ProgressCircle} from "react-desktop/windows";
 import {getTheme} from "react-uwp/Theme";
 
-const Spinner = (props) => {
+const Spinner = (props):ReactElement => {
     const {text, size, style} = props;
     const theme = getTheme();
 
