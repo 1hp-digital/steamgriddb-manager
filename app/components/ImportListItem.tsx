@@ -1,19 +1,19 @@
-import React from "react";
+import React, {ReactElement} from "react";
 import Image from "react-uwp/Image";
 import Button from "react-uwp/Button";
 import ProgressBar from "react-uwp/ProgressBar";
 import PropTypes from "prop-types";
 
-const ImportListItem = (props) => {
+const ImportListItem = (props):ReactElement => {
     const {game, platform, onImportClick, progress, thumb, steamIsRunning} = props;
 
-    const handleClick = () => {
+    const handleClick = ():void => {
         onImportClick(game, platform);
     };
 
     let progressBar = <></>;
     if (progress && progress !== 1) {
-        progressBar = <ProgressBar style={{display: "block", width: "100%"}} defaultProgressValue={this.game.progress} />;
+        progressBar = <ProgressBar style={{display: "block", width: "100%"}} defaultProgressValue={game.progress} />;
     }
 
     return (
@@ -28,7 +28,7 @@ const ImportListItem = (props) => {
             <Image
                 style={{marginRight: 10}}
                 height="30px"
-                width="64px"
+                // width="64px"
                 src={thumb}
             />
             {game.name}
@@ -59,7 +59,7 @@ ImportListItem.propTypes = {
 ImportListItem.defaultProps = {
     progress: 0,
     thumb: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII=",
-    onImportClick: () => {},
+    onImportClick: ():void => {},
     steamIsRunning: false,
 };
 
