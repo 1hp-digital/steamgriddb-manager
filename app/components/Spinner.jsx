@@ -1,10 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { ProgressCircle } from "react-desktop/windows";
-import { getTheme } from "react-uwp/Theme";
+import {ProgressCircle} from "react-desktop/windows";
+import {getTheme} from "react-uwp/Theme";
 
 const Spinner = (props) => {
-    const { text, size, style } = props;
+    const {text, size, style} = props;
     const theme = getTheme();
 
     return (
@@ -20,7 +20,7 @@ const Spinner = (props) => {
             }}
         >
             <ProgressCircle size={size} color={theme.accent} />
-            <p style={{ marginTop: 15 }}>{text}</p>
+            <p style={{marginTop: 15}}>{text}</p>
         </div>
     );
 };
@@ -37,5 +37,5 @@ Spinner.defaultProps = {
     style: {},
 };
 
-Spinner.contextTypes = { theme: PropTypes.object };
+Spinner.contextTypes = {theme: PropTypes.object};
 export default Spinner;

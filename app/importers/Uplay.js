@@ -1,4 +1,4 @@
-import { PowerShell, LauncherAutoClose } from "../utils/paths";
+import {PowerShell, LauncherAutoClose} from "../utils/paths";
 
 const Registry = window.require("winreg");
 const yaml = window.require("js-yaml");
@@ -73,7 +73,7 @@ class Uplay {
                         return;
                     } if (game.length > 1) {
                         try {
-                            const gameParsed = yaml.load(game.join("\n"), {"json": true });
+                            const gameParsed = yaml.load(game.join("\n"), {"json": true});
 
                             if (launcherId) {
                                 gameParsed.root.launcher_id = launcherId;

@@ -13,7 +13,7 @@ const ImportListItem = (props) => {
 
     let progressBar = <></>;
     if (progress && progress !== 1) {
-        progressBar = <ProgressBar style={{ display: "block", width: "100%" }} defaultProgressValue={this.game.progress} />;
+        progressBar = <ProgressBar style={{display: "block", width: "100%"}} defaultProgressValue={this.game.progress} />;
     }
 
     return (
@@ -26,14 +26,14 @@ const ImportListItem = (props) => {
             }}
         >
             <Image
-                style={{ marginRight: 10 }}
+                style={{marginRight: 10}}
                 height="30px"
                 width="64px"
                 src={thumb}
             />
             {game.name}
             <Button
-                style={{ opacity: 0, marginLeft: "auto" }}
+                style={{opacity: 0, marginLeft: "auto"}}
                 onClick={handleClick}
                 disabled={steamIsRunning}
             >

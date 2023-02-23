@@ -1,5 +1,5 @@
 import SteamID from "steamid";
-import { crc32 } from "crc";
+import {crc32} from "crc";
 import getSteamPath from "./steam/getSteamPath";
 import getLoggedInUser from "./steam/getLoggedInUser";
 import getCurrentUserGridPath from "./steam/getCurrentUserGridPath";
@@ -8,12 +8,12 @@ import getShortcutFile from "./steam/getShortcutFile";
 
 const Store = window.require("electron-store");
 const fs = window.require("fs");
-const { join, extname } = window.require("path");
+const {join, extname} = window.require("path");
 const VDF = window.require("@node-steam/vdf");
 const shortcut = window.require("steam-shortcut-editor");
 const https = window.require("https");
 const Stream = window.require("stream").Transform;
-const { metrohash64 } = window.require("metrohash");
+const {metrohash64} = window.require("metrohash");
 const log = window.require("electron-log");
 const Categories = window.require("steam-categories");
 const glob = window.require("glob");
@@ -144,7 +144,7 @@ class Steam {
 
             Object.keys(loginusersData.users).forEach((user) => {
                 if (loginusersData.users[user].MostRecent || loginusersData.users[user].mostrecent) {
-                    const { accountid } = (new SteamID(user));
+                    const {accountid} = (new SteamID(user));
                     this.loggedInUser = accountid;
                     log.info(`Got Steam user: ${accountid}`);
                     resolve(accountid);

@@ -21,7 +21,7 @@ const ImportList = (props) => {
     };
 
     const importList = games.map((game, i) => {
-        let { progress } = game;
+        let {progress} = game;
         let thumb;
 
         if (game.progress === undefined) {

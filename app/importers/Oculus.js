@@ -24,7 +24,7 @@ class Oculus {
     }
 
     // Gets the configured Oculus library path
-    // TODO: Support multiple configured library paths 
+    // TODO: Support multiple configured library paths
     static getOculusLibraryPath() {
         return new Promise((resolve, reject) => {
             const reg = new Registry({
@@ -45,15 +45,15 @@ class Oculus {
                         if (err) {
                             reject(err);
                         }
-        
+
                         let oculusLibraryPath = false;
-        
+
                         items.forEach((item) => {
                             if (item.name === "Path") {
                                 oculusLibraryPath = item.value;
                             }
                         });
-        
+
                         if (oculusLibraryPath) {
                             resolve(oculusLibraryPath);
                         } else {
@@ -66,9 +66,9 @@ class Oculus {
     }
 
     static getFilesFromPath(path, extension) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             let dir = fs.readdirSync( path );
-            resolve(dir.filter( (elm) => elm.match(new RegExp(`.*\.(${extension})`, "ig"))));
+            resolve(dir.filter( (elm) => elm.match(new RegExp(`.*.(${extension})`, "ig"))));
         });
     }
 
@@ -103,7 +103,7 @@ class Oculus {
 
     // Gets the game title from Oculus website
     static getGameTitle(appId) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             const url = "https://www.oculus.com/experiences/rift/" + appId + "/";
             request.get(url, (error, response, data) => {
                 const $ = cheerio.load(data);
@@ -127,7 +127,7 @@ class Oculus {
                     const softwareDir = volumeLetteredPath + "\\Software";
                     const games = [];
                     const addGamesPromises = [];
-      
+
                     this.getFilesFromPath(manifestDir, ".json.mini").then((filePaths) => {
                         filePaths.forEach((fp) => {
                             let manifest = JSON.parse(fs.readFileSync(manifestDir + "\\" + fp));

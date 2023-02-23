@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import UWPNoise from "../images/uwp-noise.png";
 
-const TopBlur = ({ additionalHeight }) => (
+const TopBlur = ({additionalHeight}) => (
     <div
         style={{
             position: "fixed",

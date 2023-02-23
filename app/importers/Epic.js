@@ -1,10 +1,10 @@
-import { PowerShell, LauncherAutoClose } from "../utils/paths";
+import {PowerShell, LauncherAutoClose} from "../utils/paths";
 
 const Registry = window.require("winreg");
 const fs = window.require("fs");
 const path = window.require("path");
 const jsonminify = window.require("jsonminify");
-const { arch } = window.require("os");
+const {arch} = window.require("os");
 const log = window.require("electron-log");
 
 class Epic {

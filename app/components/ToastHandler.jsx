@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import PubSub from "pubsub-js";
 import Toast from "react-uwp/Toast";
 import Icon from "react-uwp/Icon";
@@ -8,7 +8,7 @@ const ToastHandler = () => {
 
     useEffect(() => {
         PubSub.subscribe("toast", (message, args) => {
-            const toast = { toast: args, show: true };
+            const toast = {toast: args, show: true};
             close(toast, 3000);
             setToasts(toasts.concat(toast));
         });

@@ -1,10 +1,10 @@
-import { PowerShell, LauncherAutoClose } from "../utils/paths";
+import {PowerShell, LauncherAutoClose} from "../utils/paths";
 
 const Registry = window.require("winreg");
 const fs = window.require("fs");
 const path = window.require("path");
 const querystring = window.require("querystring");
-const { xml2js } = window.require("xml-js");
+const {xml2js} = window.require("xml-js");
 const iconv = window.require("iconv-lite");
 const log = window.require("electron-log");
 
@@ -110,9 +110,9 @@ class Origin {
                                             try {
                                                 const installerDataFile = fs.readFileSync(installerDataPath);
                                                 try {
-                                                    xml = xml2js(iconv.decode(installerDataFile, "utf8"), { compact: true });
+                                                    xml = xml2js(iconv.decode(installerDataFile, "utf8"), {compact: true});
                                                 } catch (err) {
-                                                    xml = xml2js(iconv.decode(installerDataFile, "utf16"), { compact: true });
+                                                    xml = xml2js(iconv.decode(installerDataFile, "utf16"), {compact: true});
                                                 }
                                             } catch (err) {
                                                 return reject(new Error(`Could not parse installerdata.xml for ${path.basename(folder)}`));

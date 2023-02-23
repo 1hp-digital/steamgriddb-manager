@@ -1,5 +1,5 @@
-const { app, globalShortcut, BrowserWindow } = require("electron");
-const { autoUpdater } = require("electron-updater");
+const {app, globalShortcut, BrowserWindow} = require("electron");
+const {autoUpdater} = require("electron-updater");
 const log = require("electron-log");
 const chokidar = require("chokidar");
 
@@ -8,7 +8,7 @@ const url = require("url");
 
 autoUpdater.autoInstallOnAppQuit = true;
 
-log.catchErrors({ showDialog: true });
+log.catchErrors({showDialog: true});
 
 log.info(`Started SGDB Manager ${app.getVersion()}`);
 

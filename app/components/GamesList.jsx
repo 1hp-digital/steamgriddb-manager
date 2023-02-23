@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import PropTypes from "prop-types";
-import { Redirect } from "react-router-dom";
+import {Redirect} from "react-router-dom";
 import AutoSuggestBox from "react-uwp/AutoSuggestBox";
 import AppBarButton from "react-uwp/AppBarButton";
 import AppBarSeparator from "react-uwp/AppBarSeparator";
 import Separator from "react-uwp/Separator";
 import Fuse from "fuse.js";
 import PubSub from "pubsub-js";
-import { debounce } from "lodash";
-import { forceCheck } from "react-lazyload";
+import {debounce} from "lodash";
+import {forceCheck} from "react-lazyload";
 import Spinner from "./Spinner";
 import Steam from "../utils/Steam";
 import TopBlur from "./TopBlur";
 import GameListItem from "./GameListItem.tsx";
-import { getTheme } from "react-uwp/Theme";
+import {getTheme} from "react-uwp/Theme";
 import getSteamPath from "../utils/steam/getSteamPath";
-import getSteamGames from '../utils/steam/getSteamGames';
+import getSteamGames from "../utils/steam/getSteamGames";
 
 const log = window.require("electron-log");
 
@@ -78,7 +78,7 @@ const GamesList = () => {
 
     const toGame = (platform, index) => {
         const data = items[platform][index];
-        setRedirect(<Redirect to={{ pathname: "/game", state: data }} />);
+        setRedirect(<Redirect to={{pathname: "/game", state: data}} />);
     };
 
     const refreshGames = () => {
@@ -87,7 +87,7 @@ const GamesList = () => {
     };
 
     const filterGames = (searchTerm) => {
-        const items = { ...fetchedGames };
+        const items = {...fetchedGames};
 
         if (searchTerm.trim() === "") {
             setItems(items);
@@ -115,7 +115,7 @@ const GamesList = () => {
 
     if (!hasSteam) {
         return (
-            <h5 style={{ ...theme.typographyStyles.title, textAlign: "center" }}>
+            <h5 style={{...theme.typographyStyles.title, textAlign: "center"}}>
                 Steam installation not found.
             </h5>
         );
@@ -130,7 +130,7 @@ const GamesList = () => {
     }
 
     return (
-        <div style={{ height: "inherit", overflow: "hidden" }}>
+        <div style={{height: "inherit", overflow: "hidden"}}>
             <TopBlur additionalHeight={48} />
             <div
                 style={{
@@ -143,21 +143,22 @@ const GamesList = () => {
                     zIndex: 2,
                 }}
             >
-                <AutoSuggestBox style={{ marginLeft: "auto", marginRight: 24 }} placeholder="Search" onChangeValue={searchInput} />
-                <AppBarSeparator style={{ height: 24 }} />
+                <AutoSuggestBox style={{marginLeft: "auto", marginRight: 24}} placeholder="Search" onChangeValue={searchInput} />
+                <AppBarSeparator style={{height: 24}} />
                 <AppBarButton
                     icon="Refresh"
                     label="Refresh"
                     onClick={refreshGames}
                 />
             </div>
-            <div id="grids-container" style={{ height: "100%", overflow: "auto", paddingTop: 64 }}>
+            <div id="grids-container" style={{height: "100%", overflow: "auto", paddingTop: 64}}>
                 {Object.keys(items).map((platform, i) => (
                     <GameListItem
                         key={platform}
                         platform={platform}
                         platformName={platformNames[platform]}
                         listSource={[
+                            // eslint-disable-next-line react/no-unknown-property
                             ...items[platform].map((item) => <p key={item.appid} id={`game-${item.appid}`} game={item}>{item.name}</p>),
                             <Separator key={i} disabled />,
                         ]}
@@ -169,5 +170,5 @@ const GamesList = () => {
     );
 };
 
-GamesList.contextTypes = { theme: PropTypes.object };
+GamesList.contextTypes = {theme: PropTypes.object};
 export default GamesList;

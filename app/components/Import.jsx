@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import PropTypes from "prop-types";
 import PubSub from "pubsub-js";
-import { Icon } from "react-uwp";
-import { isEqual } from "lodash";
+import {Icon} from "react-uwp";
+import {isEqual} from "lodash";
 import ImportList from "./ImportList";
 import ImportAllButton from "./ImportAllButton";
 import Spinner from "./Spinner";
 import Steam from "../utils/Steam";
 import platformModules from "../importers";
-import { getTheme } from "react-uwp/Theme";
-import generateNewAppId from '../utils/steam/generateNewAppId';
+import {getTheme} from "react-uwp/Theme";
+import generateNewAppId from "../utils/steam/generateNewAppId";
 
 const Store = window.require("electron-store");
 const steamGridDB = window.require("steamgriddb");
-const { metrohash64 } = window.require("metrohash");
+const {metrohash64} = window.require("metrohash");
 const log = window.require("electron-log");
 
 const Import = () => {
@@ -246,7 +246,7 @@ const Import = () => {
                 let logos = [];
 
                 // Get posters
-                const getPosters = SGDB.getGrids({ type: platform.id, id: ids.join(","), dimensions: ["600x900"] }).then((res) => {
+                const getPosters = SGDB.getGrids({type: platform.id, id: ids.join(","), dimensions: ["600x900"]}).then((res) => {
                     posters = _formatResponse(ids, res);
                 }).catch((e) => {
                     log.error("Error getting posters");
@@ -255,7 +255,7 @@ const Import = () => {
                 });
 
                 // Get heroes
-                const getHeroes = SGDB.getHeroes({ type: platform.id, id: ids.join(",") }).then((res) => {
+                const getHeroes = SGDB.getHeroes({type: platform.id, id: ids.join(",")}).then((res) => {
                     heroes = _formatResponse(ids, res);
                 }).catch((e) => {
                     log.error("Error getting heroes");
@@ -264,7 +264,7 @@ const Import = () => {
                 });
 
                 // Get heroes
-                const getLogos = SGDB.getLogos({ type: platform.id, id: ids.join(",") }).then((res) => {
+                const getLogos = SGDB.getLogos({type: platform.id, id: ids.join(",")}).then((res) => {
                     logos = _formatResponse(ids, res);
                 }).catch((e) => {
                     log.error("Error getting logos");
@@ -380,7 +380,7 @@ const Import = () => {
                         if (!platform.error && platform.games.length) {
                             return (
                                 <div key={platform.id}>
-                                    <h5 style={{ float: "left", ...theme.typographyStyles.subTitle }}>
+                                    <h5 style={{float: "left", ...theme.typographyStyles.subTitle}}>
                                         {platform.name}
                                     </h5>
 
@@ -411,5 +411,5 @@ const Import = () => {
     );
 };
 
-Import.contextTypes = { theme: PropTypes.object };
+Import.contextTypes = {theme: PropTypes.object};
 export default Import;

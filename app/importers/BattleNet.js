@@ -1,5 +1,5 @@
 import decoder from "blizzard-product-parser/src/js/database"; // Workaround for badly configured lib
-import { PowerShell, LauncherAutoClose } from "../utils/paths";
+import {PowerShell, LauncherAutoClose} from "../utils/paths";
 
 const Registry = window.require("winreg");
 const fs = window.require("fs");
@@ -146,7 +146,7 @@ class BattleNet {
                         const gameId = product.uid;
                         const productCode = product.productCode.toLowerCase();
                         if (BNET_GAMES[productCode]) {
-                            const { launchId, name, exes } = BNET_GAMES[productCode];
+                            const {launchId, name, exes} = BNET_GAMES[productCode];
                             const icon = path.join(product.settings.installPath, BNET_GAMES[productCode].icon);
                             games.push({
                                 id: gameId,

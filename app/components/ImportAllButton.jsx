@@ -11,7 +11,7 @@ const ImportAllButton = (props) => {
 
     return (
         <Button
-            style={{ float: "right" }}
+            style={{float: "right"}}
             onClick={handleClick}
             disabled={steamIsRunning}
         >

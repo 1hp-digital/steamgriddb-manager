@@ -1,9 +1,9 @@
 import * as React from "react";
-import { TitleBar } from "react-desktop/windows";
-import { Theme as UWPThemeProvider, getTheme } from "react-uwp/Theme";
+import {TitleBar} from "react-desktop/windows";
+import {Theme as UWPThemeProvider, getTheme} from "react-uwp/Theme";
 import NavigationView from "react-uwp/NavigationView";
 import SplitViewCommand from "react-uwp/SplitViewCommand";
-import { IconButton } from "react-uwp";
+import {IconButton} from "react-uwp";
 import PubSub from "pubsub-js";
 import {
     HashRouter as Router,
@@ -22,11 +22,11 @@ import {ReactElement, useState} from "react";
 
 // Using window.require so babel doesn't change the node require
 const electron = window.require("electron");
-const { remote } = electron;
+const {remote} = electron;
 
 // Log renderer errors
 const log = window.require("electron-log");
-log.catchErrors({ showDialog: true });
+log.catchErrors({showDialog: true});
 
 const App = ():ReactElement => {
     const [isMaximized, setIsMaximized] = useState(false);
@@ -119,7 +119,7 @@ const App = ():ReactElement => {
             })}
         >
             <Router>
-                <div style={{ backgroundColor: "#1a1a1a" }}>
+                <div style={{backgroundColor: "#1a1a1a"}}>
                     {backButton}
                     <TitleBar
                         title="SteamGridDB Manager"
