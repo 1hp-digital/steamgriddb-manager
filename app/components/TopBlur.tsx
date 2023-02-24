@@ -1,8 +1,11 @@
 import React, {ReactElement} from "react";
-import PropTypes from "prop-types";
 import UWPNoise from "../images/uwp-noise.png";
 
-const TopBlur = ({additionalHeight}):ReactElement => (
+interface TopBlurProps {
+    additionalHeight?: number;
+}
+
+const TopBlur = ({additionalHeight}:TopBlurProps):ReactElement => (
     <div
         style={{
             position: "fixed",
@@ -16,13 +19,5 @@ const TopBlur = ({additionalHeight}):ReactElement => (
         }}
     />
 );
-
-TopBlur.propTypes = {
-    additionalHeight: PropTypes.number,
-};
-
-TopBlur.defaultProps = {
-    additionalHeight: 0,
-};
 
 export default TopBlur;

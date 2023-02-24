@@ -1,10 +1,19 @@
-import React, {ReactElement} from "react";
-import PropTypes from "prop-types";
+import React, {CSSProperties, ReactElement} from "react";
 import {ProgressCircle} from "react-desktop/windows";
 import {getTheme} from "react-uwp/Theme";
 
-const Spinner = (props):ReactElement => {
-    const {text, size, style} = props;
+interface SpinnerProps {
+    text?: string;
+    size?: number;
+    style?: CSSProperties;
+}
+
+const Spinner = (props:SpinnerProps):ReactElement => {
+    const {
+        text = "",
+        size = 100,
+        style = {}
+    } = props;
     const theme = getTheme();
 
     return (
@@ -25,17 +34,4 @@ const Spinner = (props):ReactElement => {
     );
 };
 
-Spinner.propTypes = {
-    text: PropTypes.string,
-    size: PropTypes.number,
-    style: PropTypes.object,
-};
-
-Spinner.defaultProps = {
-    text: "",
-    size: 100,
-    style: {},
-};
-
-Spinner.contextTypes = {theme: PropTypes.object};
 export default Spinner;

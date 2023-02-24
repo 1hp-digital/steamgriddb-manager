@@ -4,6 +4,7 @@ export interface Game {
     type: string
     platform?: string,
     gameId?: string,
+    progress?: number
 }
 
 export interface ShortcutFile {

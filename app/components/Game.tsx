@@ -1,6 +1,5 @@
 import React, {ReactElement, useEffect, useState} from "react";
-import PropTypes from "prop-types";
-import {Redirect} from "react-router-dom";
+import {Redirect, useLocation} from "react-router-dom";
 import Image from "react-uwp/Image";
 import Button from "react-uwp/Button";
 import PubSub from "pubsub-js";
@@ -15,7 +14,7 @@ import getGameImages from "../utils/getGameImages";
 import {GameImages} from "../types";
 
 const Game = (props):ReactElement => {
-    const {location} = props;
+    const location = useLocation();
     const game = location.state;
 
     const [grid, setGrid] = useState<string|boolean>();
@@ -60,7 +59,6 @@ const Game = (props):ReactElement => {
     }
 
     const titleStyle = {
-        // ...theme.typographyStyles.subTitle,
         padding: "20px 0px 10px 0",
         width: "100%",
     };
@@ -144,11 +142,5 @@ const Game = (props):ReactElement => {
         </>
     );
 };
-
-Game.propTypes = {
-    location: PropTypes.object.isRequired,
-};
-
-Game.contextTypes = {theme: PropTypes.object};
 
 export default Game;

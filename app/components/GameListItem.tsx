@@ -1,11 +1,22 @@
 import * as React from "react";
-import * as PropTypes from "prop-types";
 import ListView from "react-uwp/ListView";
 import {getTheme} from "react-uwp/Theme";
 import {ReactElement} from "react";
 
-const GameListItem = (props): ReactElement => {
-    const {platform, platformName, listSource, onItemClick} = props;
+interface GameListItemProps {
+    platform: string;
+    listSource: ReactElement[];
+    platformName: string;
+    onItemClick: (platform: string, index: number) => void;
+}
+
+const GameListItem = (props:GameListItemProps): ReactElement => {
+    const {
+        platform,
+        platformName,
+        listSource,
+        onItemClick = (): void => {}
+    } = props;
 
     const theme = getTheme();
 
@@ -35,18 +46,5 @@ const GameListItem = (props): ReactElement => {
         </div>
     );
 };
-
-GameListItem.propTypes = {
-    platform: PropTypes.string.isRequired,
-    listSource: PropTypes.arrayOf(PropTypes.node).isRequired,
-    platformName: PropTypes.string.isRequired,
-    onItemClick: PropTypes.func,
-};
-
-GameListItem.defaultProps = {
-    onItemClick: (): void => {},
-};
-
-GameListItem.contextTypes = {theme: PropTypes.object};
 
 export default GameListItem;

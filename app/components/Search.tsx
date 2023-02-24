@@ -1,6 +1,5 @@
 import React, {ReactElement, useEffect, useState} from "react";
-import PropTypes from "prop-types";
-import {Redirect} from "react-router-dom";
+import {Redirect, useLocation} from "react-router-dom";
 import Image from "react-uwp/Image";
 import Button from "react-uwp/Button";
 import PubSub from "pubsub-js";
@@ -11,9 +10,8 @@ import addAsset from "../utils/addAsset";
 
 const SteamGridDB = window.require("steamgriddb");
 
-const Search = (props):ReactElement => {
-    const {location} = props;
-    console.log(SteamGridDB);
+const Search = ():ReactElement => {
+    const location = useLocation();
 
     const SGDB = new SteamGridDB("b971a6f5f280490ab62c0ee7d0fd1d16");
     const game = location.state;
@@ -156,11 +154,5 @@ const Search = (props):ReactElement => {
         </>
     );
 };
-
-Search.propTypes = {
-    location: PropTypes.object.isRequired,
-};
-
-Search.contextTypes = {theme: PropTypes.object};
 
 export default Search;

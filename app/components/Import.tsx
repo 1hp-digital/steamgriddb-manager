@@ -1,6 +1,5 @@
 // @ts-nocheck
 import React, {ReactElement, useEffect, useState} from "react";
-import PropTypes from "prop-types";
 import PubSub from "pubsub-js";
 import {Icon} from "react-uwp";
 import {isEqual} from "lodash";
@@ -421,5 +420,4 @@ const Import = ():ReactElement => {
     );
 };
 
-Import.contextTypes = {theme: PropTypes.object};
 export default Import;
