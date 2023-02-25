@@ -90,6 +90,7 @@ const Import = ():ReactElement => {
                             return platform.class.getGames()
                                 .then((games) => {
                                     // Filter out any games that are already imported
+                                    // @todo this section needs to be updates after changes to nonSteamGames
                                     if (nonSteamGames && nonSteamGames[platform.id]) {
                                         games = games.filter((game) => {
                                             return !nonSteamGames[platform.id].find((nonSteamGame) => {

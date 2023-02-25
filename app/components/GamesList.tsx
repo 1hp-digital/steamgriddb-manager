@@ -3,19 +3,17 @@ import {Redirect} from "react-router-dom";
 import AutoSuggestBox from "react-uwp/AutoSuggestBox";
 import AppBarButton from "react-uwp/AppBarButton";
 import AppBarSeparator from "react-uwp/AppBarSeparator";
-import Separator from "react-uwp/Separator";
 import Fuse from "fuse.js";
 import PubSub from "pubsub-js";
 import {debounce} from "lodash";
 import {forceCheck} from "react-lazyload";
 import Spinner from "./Spinner";
 import TopBlur from "./TopBlur";
-import GameListItemOld from "./GameListItemOld";
 import {getTheme} from "react-uwp/Theme";
 import getSteamPath from "../utils/getSteamPath";
 import getSteamGames from "../utils/getSteamGames";
 import getNonSteamGames from "../utils/getNonSteamGames";
-import {GamesList} from "../types";
+import {Game} from "../types";
 import GameListItem from "./GameListItem";
 
 const log = window.require("electron-log");
@@ -25,16 +23,11 @@ const GamesList = ():ReactElement => {
         searchGames(searchTerm);
     }, 300);
 
-    const platformNames = {
-        steam: "Steam",
-        other: "Other Games",
-    };
-
-    const [fetchedGames, setFetchedGames] = useState({});
+    const [fetchedGames, setFetchedGames] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
     const [redirect, setRedirect] = useState<ReactElement|null>(null);
     const [hasSteam, setHasSteam] = useState(true);
-    const [items, setItems] = useState<GamesList>({});
+    const [displayedGames, setDisplayedGames] = useState<Game[]>([]);
 
     const theme = getTheme();
 
@@ -58,28 +51,24 @@ const GamesList = ():ReactElement => {
     const fetchGames = async ():Promise<void> => {
         const steamGames = await getSteamGames();
         const nonSteamGames = await getNonSteamGames();
-        const items = {steam: steamGames, ...nonSteamGames};
+        const items = [...steamGames, ...nonSteamGames];
 
         // Sort games alphabetically
-        Object.keys(items)
-            .forEach((platform) => {
-                items[platform] = items[platform].sort((a, b) => {
-                    if (a.name > b.name) {
-                        return 1;
-                    }
+        items.sort((a, b) => {
+            if (a.name > b.name) {
+                return 1;
+            }
 
-                    return ((b.name > a.name) ? -1 : 0);
-                });
-            });
+            return ((b.name > a.name) ? -1 : 0);
+        });
 
         setFetchedGames(items);
         setIsLoaded(true);
-        setItems(items);
+        setDisplayedGames(items);
     };
 
-    const toGame = (platform, index):void => {
-        const data = items[platform][index];
-        setRedirect(<Redirect to={{pathname: "/game", state: data}} />);
+    const toGame = (game):void => {
+        setRedirect(<Redirect to={{pathname: "/game", state: game}} />);
     };
 
     const refreshGames = ():void => {
@@ -91,7 +80,7 @@ const GamesList = ():ReactElement => {
         const items = {...fetchedGames};
 
         if (searchTerm.trim() === "") {
-            setItems(items);
+            setDisplayedGames(items);
             return;
         }
 
@@ -110,7 +99,7 @@ const GamesList = ():ReactElement => {
             items[platform] = fuse.search(searchTerm);
         });
 
-        setItems(items);
+        setDisplayedGames(items);
         forceCheck(); // Recheck lazyload
     };
 
@@ -159,17 +148,15 @@ const GamesList = ():ReactElement => {
                 display: "flex",
                 flexWrap: "wrap"
             }}>
-                {Object.keys(items).map((platform, ) => (
-                    items[platform].map((item, i) => {
-                        return (
-                            <GameListItem
-                                key={item.appid}
-                                game={item}
-                                onClick={(): void => toGame(platform, i)}
-                            />
-                        );
-                    })
-                ))}
+                {displayedGames.map((item) => {
+                    return (
+                        <GameListItem
+                            key={item.appid}
+                            game={item}
+                            onClick={(): void => toGame(item)}
+                        />
+                    );
+                })}
             </div>
         </div>
     );

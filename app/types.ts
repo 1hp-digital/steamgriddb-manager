@@ -19,10 +19,6 @@ export interface GameImages {
     poster: string|boolean
 }
 
-export interface GamesList {
-    [key: string]: Game[]
-}
-
 export interface SteamGridDBImageData {
     author: {
         name: "QuiGonJinnah",
