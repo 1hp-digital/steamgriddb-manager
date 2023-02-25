@@ -10,18 +10,19 @@ import {debounce} from "lodash";
 import {forceCheck} from "react-lazyload";
 import Spinner from "./Spinner";
 import TopBlur from "./TopBlur";
-import GameListItem from "./GameListItem";
+import GameListItemOld from "./GameListItemOld";
 import {getTheme} from "react-uwp/Theme";
 import getSteamPath from "../utils/getSteamPath";
 import getSteamGames from "../utils/getSteamGames";
 import getNonSteamGames from "../utils/getNonSteamGames";
 import {GamesList} from "../types";
+import GameListItem from "./GameListItem";
 
 const log = window.require("electron-log");
 
 const GamesList = ():ReactElement => {
     const searchInput = debounce((searchTerm) => {
-        filterGames(searchTerm);
+        searchGames(searchTerm);
     }, 300);
 
     const platformNames = {
@@ -86,7 +87,7 @@ const GamesList = ():ReactElement => {
         fetchGames();
     };
 
-    const filterGames = (searchTerm):void => {
+    const searchGames = (searchTerm):void => {
         const items = {...fetchedGames};
 
         if (searchTerm.trim() === "") {
@@ -151,18 +152,23 @@ const GamesList = ():ReactElement => {
                     onClick={refreshGames}
                 />
             </div>
-            <div id="grids-container" style={{height: "100%", overflow: "auto", paddingTop: 64}}>
-                {Object.keys(items).map((platform, i) => (
-                    <GameListItem
-                        key={platform}
-                        platform={platform}
-                        platformName={platformNames[platform]}
-                        listSource={[
-                            ...items[platform].map((item) => <p key={item.appid} id={`game-${item.appid}`}>{item.name}</p>),
-                            <Separator key={i} disabled />,
-                        ]}
-                        onItemClick={toGame}
-                    />
+            <div id="grids-container" style={{
+                height: "100%",
+                overflow: "auto",
+                paddingTop: 84,
+                display: "flex",
+                flexWrap: "wrap"
+            }}>
+                {Object.keys(items).map((platform, ) => (
+                    items[platform].map((item, i) => {
+                        return (
+                            <GameListItem
+                                key={item.appid}
+                                game={item}
+                                onClick={(): void => toGame(platform, i)}
+                            />
+                        );
+                    })
                 ))}
             </div>
         </div>

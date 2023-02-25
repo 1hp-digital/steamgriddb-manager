@@ -1,48 +1,36 @@
-import * as React from "react";
-import ListView from "react-uwp/ListView";
-import {getTheme} from "react-uwp/Theme";
-import {ReactElement} from "react";
+// @ts-nocheck
+import {Game} from "../types";
+import React, {ReactElement, useEffect, useState} from "react";
+import getGameImages from "../utils/getGameImages";
+
 
 interface GameListItemProps {
-    platform: string;
-    listSource: ReactElement[];
-    platformName: string;
-    onItemClick: (platform: string, index: number) => void;
+    game: Game,
+    onClick: () => void
 }
 
-const GameListItem = (props:GameListItemProps): ReactElement => {
-    const {
-        platform,
-        platformName,
-        listSource,
-        onItemClick = (): void => {}
-    } = props;
+const GameListItem = (props:GameListItemProps):ReactElement => {
+    const {game, onClick} = props;
+    const [image, setImage] = useState(false);
 
-    const theme = getTheme();
+    console.log("GameListItem", props);
 
-    const handleClick = (index): void => {
-        onItemClick(platform, index);
-    };
+    useEffect(() => {
+        const getImages = async (): void => {
+            const images = await getGameImages(game);
+            setImage(images.poster);
+        };
+
+        getImages();
+    }, []);
+
 
     return (
-        <div key={platform} style={{paddingLeft: 10}}>
-            <div style={{
-                ...theme.typographyStyles.subTitleAlt,
-                display: "inline-block",
-                position: "sticky",
-                zIndex: 3,
-                marginLeft: 10,
-                top: -22,
-            }}
-            >
-                {platformName}
-            </div>
-            <ListView
-                style={{border: 0, width: "100%"}}
-                background="transparent"
-                onChooseItem={handleClick}
-                listSource={listSource}
-            />
+        <div onClick={onClick} className="grow" style={{
+            padding: "10px",
+            filter: "drop-shadow(5px 5px 15px #042430)",
+        }}>
+            <img src={image} width={150} />
         </div>
     );
 };
