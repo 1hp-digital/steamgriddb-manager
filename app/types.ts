@@ -22,9 +22,9 @@ export interface GameImages {
 
 export interface SteamGridDBImageData {
     author: {
-        name: "QuiGonJinnah",
-        steam64: "76561198045337884",
-        avatar: "https://avatars.akamai.steamstatic.com/7505e767c82d1ea4f68f53cea518a12ba3a2f946_medium.jpg"
+        name: string,
+        steam64: string,
+        avatar: string
     },
     downvotes: number,
     epilepsy: boolean,

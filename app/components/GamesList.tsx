@@ -85,28 +85,26 @@ const GamesList = ():ReactElement => {
     };
 
     const searchGames = (searchTerm):void => {
-        const items = {...fetchedGames};
+        let items = [...fetchedGames];
 
         if (searchTerm.trim() === "") {
             setDisplayedGames(items);
             return;
         }
 
-        Object.keys(items).forEach((platform) => {
-            const fuse = new Fuse(items[platform], {
-                shouldSort: true,
-                threshold: 0.6,
-                location: 0,
-                distance: 100,
-                maxPatternLength: 32,
-                minMatchCharLength: 1,
-                keys: [
-                    "name",
-                ],
-            });
-            items[platform] = fuse.search(searchTerm);
+        const fuse = new Fuse(items, {
+            shouldSort: true,
+            threshold: 0.6,
+            location: 0,
+            distance: 100,
+            maxPatternLength: 32,
+            minMatchCharLength: 1,
+            keys: [
+                "name",
+            ],
         });
-
+        items = fuse.search(searchTerm);
+        
         setDisplayedGames(items);
         forceCheck(); // Recheck lazyload
     };
