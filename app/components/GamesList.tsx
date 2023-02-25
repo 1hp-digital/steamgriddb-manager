@@ -15,8 +15,11 @@ import getSteamGames from "../utils/getSteamGames";
 import getNonSteamGames from "../utils/getNonSteamGames";
 import {Game} from "../types";
 import GameListItem from "./GameListItem";
+import {DropDownMenu} from "react-uwp";
 
 const log = window.require("electron-log");
+
+const ALL_GAMES = "ALL GAMES";
 
 const GamesList = ():ReactElement => {
     const searchInput = debounce((searchTerm) => {
@@ -28,6 +31,7 @@ const GamesList = ():ReactElement => {
     const [redirect, setRedirect] = useState<ReactElement|null>(null);
     const [hasSteam, setHasSteam] = useState(true);
     const [displayedGames, setDisplayedGames] = useState<Game[]>([]);
+    const [tags, setTags] = useState<string[]>([]);
 
     const theme = getTheme();
 
@@ -62,7 +66,11 @@ const GamesList = ():ReactElement => {
             return ((b.name > a.name) ? -1 : 0);
         });
 
+        const tags = [...new Set(items.flatMap(({tags}) => tags))]
+            .map((tag) => tag?.toUpperCase() ?? ALL_GAMES);
+
         setFetchedGames(items);
+        setTags(tags);
         setIsLoaded(true);
         setDisplayedGames(items);
     };
@@ -73,7 +81,7 @@ const GamesList = ():ReactElement => {
 
     const refreshGames = ():void => {
         setIsLoaded(false);
-        fetchGames();
+        void fetchGames();
     };
 
     const searchGames = (searchTerm):void => {
@@ -101,6 +109,19 @@ const GamesList = ():ReactElement => {
 
         setDisplayedGames(items);
         forceCheck(); // Recheck lazyload
+    };
+
+    const filterGames = (tagToFilter):void => {
+        if (tagToFilter === ALL_GAMES) {
+            setDisplayedGames(fetchedGames);
+            return;
+        }
+
+        const filteredGames = fetchedGames.filter((item) => {
+            return item.tags?.some((tag) => tagToFilter.toUpperCase() === tag.toUpperCase());
+        });
+
+        setDisplayedGames(filteredGames);
     };
 
     if (!hasSteam) {
@@ -133,6 +154,11 @@ const GamesList = ():ReactElement => {
                     zIndex: 2,
                 }}
             >
+                <DropDownMenu
+                    defaultValue={ALL_GAMES}
+                    values={tags}
+                    onChangeValue={filterGames}
+                />
                 <AutoSuggestBox style={{marginLeft: "auto", marginRight: 24}} placeholder="Search" onChangeValue={searchInput} />
                 <AppBarSeparator style={{height: 24}} />
                 <AppBarButton

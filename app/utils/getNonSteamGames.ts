@@ -38,6 +38,7 @@ const getNonSteamGames = async ():Promise<Game[]> => {
                             name: appName,
                             platform: storedGame.platform,
                             type: "shortcut",
+                            tags: item.tags,
                             appid,
                         });
 
@@ -49,6 +50,7 @@ const getNonSteamGames = async ():Promise<Game[]> => {
                         name: appName,
                         platform: "other",
                         type: "shortcut",
+                        tags: item.tags,
                         appid,
                     });
                 }
