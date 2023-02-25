@@ -2,7 +2,7 @@ export interface Game {
     appid: number,
     name: string,
     type: string,
-    tags: string[],
+    tags?: string[],
     platform?: string,
     gameId?: string,
     progress?: number,
