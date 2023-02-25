@@ -52,27 +52,30 @@ const GamesList = ():ReactElement => {
         void fetchData();
     }, []);
 
-    const fetchGames = async ():Promise<void> => {
-        const steamGames = await getSteamGames();
-        const nonSteamGames = await getNonSteamGames();
-        const items = [...steamGames, ...nonSteamGames];
-
-        // Sort games alphabetically
-        items.sort((a, b) => {
+    const sortGames = (games:Game[]):Game[] => {
+        return games.sort((a, b) => {
             if (a.name > b.name) {
                 return 1;
             }
 
             return ((b.name > a.name) ? -1 : 0);
         });
+    };
 
-        const tags = [...new Set(items.flatMap(({tags}) => tags))]
+    const fetchGames = async ():Promise<void> => {
+        const steamGames = await getSteamGames();
+        const nonSteamGames = await getNonSteamGames();
+        const allGames = [...steamGames, ...nonSteamGames];
+
+        const sortedGames = sortGames(allGames);
+
+        const tags = [...new Set(sortedGames.flatMap(({tags}) => tags))]
             .map((tag) => tag?.toUpperCase() ?? ALL_GAMES);
 
-        setFetchedGames(items);
+        setFetchedGames(sortedGames);
         setTags(tags);
         setIsLoaded(true);
-        setDisplayedGames(items);
+        setDisplayedGames(sortedGames);
     };
 
     const toGame = (game):void => {
@@ -104,7 +107,7 @@ const GamesList = ():ReactElement => {
             ],
         });
         items = fuse.search(searchTerm);
-        
+
         setDisplayedGames(items);
         forceCheck(); // Recheck lazyload
     };
