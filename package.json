@@ -64,7 +64,7 @@
     "babel-loader": "^9.1.2",
     "concurrently": "^7.6.0",
     "css-loader": "^6.7.3",
-    "electron": "^6.1.12",
+    "electron": "^9.4.4",
     "electron-builder": "^21.2.0",
     "eslint": "^8.35.0",
     "eslint-plugin-react": "^7.32.2",
