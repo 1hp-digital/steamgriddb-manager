@@ -19,7 +19,7 @@ const getNonSteamGames = async ():Promise<Game[]> => {
                 const appName = item.appname || item.AppName || item.appName;
                 const exe = item.exe || item.Exe;
 
-                const appid = (item.appid) ?
+                const appid = ( item.appid) ?
                     (item.appid >>> 0) : // bitwise unsigned 32 bit ID of manually added non-steam game
                     generateNewAppId(exe, appName);
 

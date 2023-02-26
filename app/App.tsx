@@ -38,7 +38,7 @@ const App = ():ReactElement => {
         setIsMaximized(true);
     });
 
-    window.on("unmaximize", () => {
+    window.on("unmxaximize", () => {
         setIsMaximized(false);
     });
 
