@@ -112,7 +112,7 @@
     "promise-settle": "^0.3.0",
     "prop-types": "^15.7.2",
     "pubsub-js": "^1.9.2",
-    "query-string": "^6.13.8",
+    "query-string": "^8.1.0",
     "react": "^18.2.0",
     "react-desktop": "^0.3.9",
     "react-dom": "^18.2.0",
