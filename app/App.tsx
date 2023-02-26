@@ -16,7 +16,6 @@ import UWPNoise from "./images/uwp-noise.png";
 import "./styles/App.css";
 import GamesList from "./components/GamesList";
 import Game from "./components/Game";
-import Import from "./components/Import";
 import Search from "./components/Search";
 import {ReactElement, useState} from "react";
 
@@ -76,7 +75,6 @@ const App = ():ReactElement => {
 
     const navigationTopNodes = [
         <SplitViewCommand key="0" label="Library" icon="Library" onClick={():void => handleNavRedirect("/")} />,
-        <SplitViewCommand key="1" label="Import Games" icon="ImportAll" onClick={():void => handleNavRedirect("/import")} />,
     ];
 
     let backButton = <></>;
@@ -173,10 +171,8 @@ const App = ():ReactElement => {
                             {redirect && <Redirect to={redirect} />}
 
                             <Route exact path="/" component={GamesList} />
-                            <Route exact path="/import" component={Import} />
                             <Route exact path="/game" component={Game} />
                             <Route exact path="/search" component={Search} />
-
                         </div>
                     </NavigationView>
                 </div>

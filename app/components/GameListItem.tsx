@@ -14,7 +14,7 @@ const GameListItem = (props:GameListItemProps):ReactElement => {
     const [image, setImage] = useState(false);
 
     useEffect(() => {
-        const getImages = async (): void => {
+        const getImages = async (): Promise<void> => {
             const images = await getGameImages(game);
             setImage(images.poster);
             console.log(images.poster);
