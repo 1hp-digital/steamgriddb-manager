@@ -1,5 +1,5 @@
 import React, {ReactElement, useEffect, useState} from "react";
-import {Redirect, useLocation} from "react-router-dom";
+import {Navigate, useParams} from "react-router-dom";
 import Image from "react-uwp/Image";
 import Button from "react-uwp/Button";
 import PubSub from "pubsub-js";
@@ -7,15 +7,17 @@ import TopBlur from "./TopBlur";
 import Spinner from "./Spinner";
 import {getTheme} from "react-uwp/Theme";
 import addAsset from "../utils/addAsset";
+import getGame from "../utils/getGame";
+import {Game} from "../types";
 
 const SteamGridDB = window.require("steamgriddb");
 
 const Search = ():ReactElement => {
-    const location = useLocation();
-
+    const {appid, assetType} = useParams();
     const SGDB = new SteamGridDB("b971a6f5f280490ab62c0ee7d0fd1d16");
-    const game = location.state;
 
+
+    const [game, setGame] = useState<Game>();
     const [items, setItems] = useState([]);
     const [redirect, setRedirect] = useState<ReactElement|null>(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -25,29 +27,35 @@ const Search = ():ReactElement => {
     useEffect(() => {
         PubSub.publish("showBack", true);
 
-        let type = "steam";
-        if (game.platform) {
-            type = game.platform;
-        }
+        const fetchGame = async ():Promise<void> => {
+            const game = await getGame(parseInt(appid));
+            setGame(game);
+        };
 
-        let id;
-        if (game.platform) {
-            id = game.gameId;
-        } else {
-            id = game.appid;
-        }
-
-        if (game.platform === "other") {
-            type = "game";
-            SGDB.searchGame(game.name)
-                .then((gameResp) => {
-                    id = gameResp[0].id;
-                    queryApi(type, id);
-                });
-        } else {
-            queryApi(type, id);
-        }
+        void fetchGame();
     }, []);
+
+    useEffect(() => {
+        if (!game) {
+            return;
+        }
+
+        const fetchImages = async (): Promise<void> => {
+            let id = game?.platform ? game.gameId : game.appid;
+            let type = game.platform ?? "steam";
+
+            if (game?.platform === "other") {
+                type = "game";
+
+                const gameResp = await SGDB.searchGame(game.name);
+                id = gameResp[0].id;
+            }
+
+            await queryApi(type, id);
+        };
+
+        void fetchImages();
+    }, [game]);
 
     const onClick = (item, itemIndex):void => {
         const clonedItems = [...items];
@@ -55,46 +63,49 @@ const Search = ():ReactElement => {
 
         setItems(clonedItems);
 
-        addAsset(location.state.assetType, game.appid, item.url).then(() => {
+        addAsset(assetType, game.appid, item.url).then(() => {
             clonedItems[itemIndex].downloading = false;
             setItems(clonedItems);
-            setRedirect(<Redirect to={{pathname: "/game", state: location.state}} />);
+            setRedirect(<Navigate to={{pathname: `/game/${game.appid}`}} />);
         });
     };
 
-    const queryApi = (type, id):void => {
-        switch (location.state.assetType) {
+    const queryApi = async (type, id): Promise<void> => {
+        let response;
+
+        switch (assetType) {
             case "horizontalGrid":
-                SGDB.getGrids({type, id}).then((res) => {
-                    setIsLoaded(true);
-                    setItems(res);
+                response = await SGDB.getGrids({
+                    dimensions: ["460x215", "920x430"],
+                    types: ["static", "animated"],
+                    type,
+                    id
                 });
-
                 break;
+
             case "verticalGrid":
-                SGDB.getGrids({type, id, dimensions: ["600x900"]}).then((res) => {
-                    setIsLoaded(true);
-                    setItems(res);
+                response = await SGDB.getGrids({
+                    dimensions: ["600x900"],
+                    types: ["static", "animated"],
+                    type,
+                    id
                 });
-
                 break;
+
             case "hero":
-                SGDB.getHeroes({type, id}).then((res) => {
-                    setIsLoaded(true);
-                    setItems(res);
-                });
-
+                response = await SGDB.getHeroes({type, id, types: ["static", "animated"]});
                 break;
+
             case "logo":
-                SGDB.getLogos({type, id}).then((res) => {
-                    setIsLoaded(true);
-                    setItems(res);
-                });
+                response = await SGDB.getLogos({type, id, types: ["static", "animated"]});
+                break;
 
-                break;
             default:
-                break;
+                return;
         }
+
+        setIsLoaded(true);
+        setItems(response);
     };
 
     if (!isLoaded) {
@@ -104,6 +115,30 @@ const Search = ():ReactElement => {
     if (redirect) {
         return redirect;
     }
+
+    const getThumbnailElement = (src):JSX.Element => {
+        if (src.endsWith(".webm")) {
+            return (
+                <video
+                    src={src}
+                    autoPlay
+                    playsInline
+                    loop
+                    style={{width: "100%", height: "auto"}}
+                />
+            );
+        } else {
+            return (
+                <Image
+                    style={{
+                        width: "100%",
+                        height: "auto",
+                    }}
+                    src={src}
+                />
+            );
+        }
+    };
 
     return (
         <>
@@ -127,22 +162,10 @@ const Search = ():ReactElement => {
                         {item.downloading ? (
                             <div style={{position: "relative"}}>
                                 <Spinner size={70} style={{position: "absolute", background: "rgba(0,0,0,.5)"}} />
-                                <Image
-                                    style={{
-                                        width: "100%",
-                                        height: "auto",
-                                    }}
-                                    src={item.thumb}
-                                />
+                                {getThumbnailElement(item.thumb)}
                             </div>
                         ) : (
-                            <Image
-                                style={{
-                                    width: "100%",
-                                    height: "auto",
-                                }}
-                                src={item.thumb}
-                            />
+                            <>{getThumbnailElement(item.thumb)}</>
                         )}
                         <p style={{...theme.typographyStyles.captionAlt, padding: 5}}>
                             <Image style={{height: 20, marginRight: 5}} src={item.author.avatar} />

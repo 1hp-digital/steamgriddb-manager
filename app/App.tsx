@@ -6,10 +6,11 @@ import SplitViewCommand from "react-uwp/SplitViewCommand";
 import {IconButton} from "react-uwp";
 import PubSub from "pubsub-js";
 import {
-    HashRouter as Router,
-    Redirect,
+    HashRouter,
+    Routes,
     Link,
     Route,
+    Navigate
 } from "react-router-dom";
 import ToastHandler from "./components/ToastHandler";
 import UWPNoise from "./images/uwp-noise.png";
@@ -116,7 +117,7 @@ const App = ():ReactElement => {
                 useFluentDesign: true,
             })}
         >
-            <Router>
+            <HashRouter>
                 <div style={{backgroundColor: "#1a1a1a"}}>
                     {backButton}
                     <TitleBar
@@ -168,15 +169,17 @@ const App = ():ReactElement => {
                                 zIndex: 0,
                             }}
                         >
-                            {redirect && <Redirect to={redirect} />}
+                            {redirect && <Navigate to={redirect} />}
 
-                            <Route exact path="/" component={GamesList} />
-                            <Route exact path="/game" component={Game} />
-                            <Route exact path="/search" component={Search} />
+                            <Routes>
+                                <Route path="/" element={<GamesList />}/>
+                                <Route path="/game/:appid" element={<Game />} />
+                                <Route path="/search/:appid/:assetType" element={<Search />} />
+                            </Routes>
                         </div>
                     </NavigationView>
                 </div>
-            </Router>
+            </HashRouter>
 
             <ToastHandler />
         </UWPThemeProvider>

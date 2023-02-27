@@ -1,5 +1,4 @@
 import React, {ReactElement, useEffect, useState} from "react";
-import {Redirect} from "react-router-dom";
 import AutoSuggestBox from "react-uwp/AutoSuggestBox";
 import AppBarButton from "react-uwp/AppBarButton";
 import AppBarSeparator from "react-uwp/AppBarSeparator";
@@ -28,7 +27,6 @@ const GamesList = ():ReactElement => {
 
     const [fetchedGames, setFetchedGames] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
-    const [redirect, setRedirect] = useState<ReactElement|null>(null);
     const [hasSteam, setHasSteam] = useState(true);
     const [displayedGames, setDisplayedGames] = useState<Game[]>([]);
     const [tags, setTags] = useState<string[]>([]);
@@ -51,6 +49,10 @@ const GamesList = ():ReactElement => {
 
         void fetchData();
     }, []);
+
+    useEffect(() => {
+        console.log("displayedGames", displayedGames);
+    }, [displayedGames]);
 
     const sortGames = (games:Game[]):Game[] => {
         return games.sort((a, b) => {
@@ -76,10 +78,6 @@ const GamesList = ():ReactElement => {
         setTags(tags);
         setIsLoaded(true);
         setDisplayedGames(sortedGames);
-    };
-
-    const toGame = (game):void => {
-        setRedirect(<Redirect to={{pathname: "/game", state: game}} />);
     };
 
     const refreshGames = ():void => {
@@ -130,10 +128,6 @@ const GamesList = ():ReactElement => {
         return <Spinner />;
     }
 
-    if (redirect) {
-        return redirect;
-    }
-
     return (
         <div style={{height: "inherit", overflow: "hidden"}}>
             <TopBlur additionalHeight={48} />
@@ -173,7 +167,6 @@ const GamesList = ():ReactElement => {
                         <GameListItem
                             key={item.appid}
                             game={item}
-                            onClick={(): void => toGame(item)}
                         />
                     );
                 })}

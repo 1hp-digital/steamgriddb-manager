@@ -1,5 +1,5 @@
 import React, {ReactElement, useEffect, useState} from "react";
-import {Redirect, useLocation} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import Image from "react-uwp/Image";
 import Button from "react-uwp/Button";
 import PubSub from "pubsub-js";
@@ -11,17 +11,14 @@ import logoPlaceholder from "../images/logo_none.png";
 import {getTheme} from "react-uwp/Theme";
 import Spinner from "./Spinner";
 import getGameImages from "../utils/getGameImages";
-import {GameImages} from "../types";
+import {Game, GameImages} from "../types";
+import getGame from "../utils/getGame";
 
-const Game = (props):ReactElement => {
-    const location = useLocation();
-    const game = location.state;
+const Game = ():ReactElement => {
+    const {appid} = useParams();
 
-    const [grid, setGrid] = useState<string|boolean>();
-    const [poster, setPoster] = useState<string|boolean>();
-    const [hero, setHero] = useState<string|boolean>();
-    const [logo, setLogo] = useState<string|boolean>();
-    const [redirect, setRedirect] = useState<ReactElement>();
+    const [game, setGame] = useState<Game>();
+    const [images, setImages] = useState<GameImages>();
     const [isLoaded, setIsLoaded] = useState(false);
 
     const theme = getTheme();
@@ -29,22 +26,22 @@ const Game = (props):ReactElement => {
     useEffect(() => {
         PubSub.publish("showBack", true);
 
-        const fetchData = async ():Promise<void> => {
-            const images:GameImages = await getGameImages(game);
+        const fetchImages = async ():Promise<void> => {
+            const game = await getGame(parseInt(appid));
+            const images: GameImages = await getGameImages(game);
 
-            setGrid(images.grid);
-            setPoster(images.poster);
-            setHero(images.hero);
-            setLogo(images.logo);
+            setGame(game);
+            setImages(images);
             setIsLoaded(true);
         };
 
-        fetchData();
+        void fetchImages();
     }, []);
 
-    const toSearch = (assetType):void => {
-        setRedirect(<Redirect to={{pathname: "/search", state: {...location.state, assetType}}} />);
-    };
+    // @todo fix this once game ids are normalized
+    // const toSearch = (assetType):void => {
+    //     setRedirect(<Redirect to={{pathname: "/search", state: {...location.state, assetType}}} />);
+    // };
 
     const addNoCache = (imageURI):string|boolean => {
         if (!imageURI) {
@@ -54,9 +51,6 @@ const Game = (props):ReactElement => {
         return `${imageURI}?${(new Date().getTime())}`;
     };
 
-    if (redirect) {
-        return redirect;
-    }
 
     const titleStyle = {
         padding: "20px 0px 10px 0",
@@ -85,28 +79,28 @@ const Game = (props):ReactElement => {
             >
                 <h1 style={theme.typographyStyles.header}>{game.name}</h1>
                 <h5 style={titleStyle}>Hero</h5>
-                <Button style={buttonStyle} onClick={():void => toSearch("hero")}>
+                <Link to={`/search/${game.appid}/hero`}>
                     <Image
                         style={{
                             width: "100%",
                             height: "auto",
                         }}
-                        src={addNoCache(hero) || heroPlaceholder}
+                        src={addNoCache(images.hero) || heroPlaceholder}
                     />
-                </Button>
+                </Link>
 
                 <div style={{display: "flex"}}>
                     <div style={{flex: 1}}>
                         <h5 style={titleStyle}>Vertical Capsule</h5>
-                        <Button style={buttonStyle} onClick={():void => toSearch("verticalGrid")}>
+                        <Link to={`/search/${game.appid}/verticalGrid`}>
                             <Image
                                 style={{
                                     maxWidth: "100%",
                                     height: "auto",
                                 }}
-                                src={addNoCache(poster) || capsuleVerticalPlaceholder}
+                                src={addNoCache(images.poster) || capsuleVerticalPlaceholder}
                             />
-                        </Button>
+                        </Link>
                     </div>
                     <div
                         style={{
@@ -115,28 +109,28 @@ const Game = (props):ReactElement => {
                         }}
                     >
                         <h5 style={titleStyle}>Horizontal Capsule</h5>
-                        <Button style={buttonStyle} onClick={():void => toSearch("horizontalGrid")}>
+                        <Link to={`/search/${game.appid}/horizontalGrid`}>
                             <Image
                                 style={{
                                     maxWidth: "100%",
                                     height: "auto",
                                 }}
-                                src={addNoCache(grid) || capsulePlaceholder}
+                                src={addNoCache(images.grid) || capsulePlaceholder}
                             />
-                        </Button>
+                        </Link>
                     </div>
                 </div>
                 <div>
                     <h5 style={titleStyle}>Logo</h5>
-                    <Button style={buttonStyle} onClick={():void => toSearch("logo")}>
+                    <Link to={`/search/${game.appid}/logo`}>
                         <Image
                             style={{
                                 maxWidth: "100%",
                                 height: "auto",
                             }}
-                            src={addNoCache(logo) || logoPlaceholder}
+                            src={addNoCache(images.logo) || logoPlaceholder}
                         />
-                    </Button>
+                    </Link>
                 </div>
             </div>
         </>
