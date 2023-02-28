@@ -50,10 +50,6 @@ const GamesList = ():ReactElement => {
         void fetchData();
     }, []);
 
-    useEffect(() => {
-        console.log("displayedGames", displayedGames);
-    }, [displayedGames]);
-
     const sortGames = (games:Game[]):Game[] => {
         return games.sort((a, b) => {
             if (a.name > b.name) {

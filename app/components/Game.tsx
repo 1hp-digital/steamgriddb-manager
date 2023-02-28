@@ -1,7 +1,6 @@
 import React, {ReactElement, useEffect, useState} from "react";
 import {Link, useParams} from "react-router-dom";
 import Image from "react-uwp/Image";
-import Button from "react-uwp/Button";
 import PubSub from "pubsub-js";
 import TopBlur from "./TopBlur";
 import heroPlaceholder from "../images/hero_none.png";
@@ -51,13 +50,9 @@ const Game = ():ReactElement => {
         return `${imageURI}?${(new Date().getTime())}`;
     };
 
-
     const titleStyle = {
         padding: "20px 0px 10px 0",
         width: "100%",
-    };
-    const buttonStyle = {
-        padding: 0,
     };
 
     if (!isLoaded) {

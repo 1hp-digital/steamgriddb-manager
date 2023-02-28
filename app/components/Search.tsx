@@ -9,20 +9,31 @@ import {getTheme} from "react-uwp/Theme";
 import addAsset from "../utils/addAsset";
 import getGame from "../utils/getGame";
 import {Game} from "../types";
+import {DropDownMenu} from "react-uwp";
 
 const SteamGridDB = window.require("steamgriddb");
+
+const ANY_STYLE = "Any Style";
 
 const Search = ():ReactElement => {
     const {appid, assetType} = useParams();
     const SGDB = new SteamGridDB("b971a6f5f280490ab62c0ee7d0fd1d16");
 
-
     const [game, setGame] = useState<Game>();
     const [items, setItems] = useState([]);
+    const [style, setStyle] = useState(ANY_STYLE);
+    const [useStatic, setUseStatic] = useState(true);
+    const [useAnimated, setUseAnimated] = useState(true);
+    const [useHumor, setUseHumor] = useState(true);
+    const [useAdultContent, setUseAdultContent] = useState(false);
+    const [useEpilepsy, setUseEpilepsy] = useState(true);
+    const [useUntagged, setUseUntagged] = useState(true);
     const [redirect, setRedirect] = useState<ReactElement|null>(null);
     const [isLoaded, setIsLoaded] = useState(false);
 
     const theme = getTheme();
+
+    const styles = [ANY_STYLE, "Static", "Animated"];
 
     useEffect(() => {
         PubSub.publish("showBack", true);
@@ -40,22 +51,26 @@ const Search = ():ReactElement => {
             return;
         }
 
-        const fetchImages = async (): Promise<void> => {
-            let id = game?.platform ? game.gameId : game.appid;
-            let type = game.platform ?? "steam";
-
-            if (game?.platform === "other") {
-                type = "game";
-
-                const gameResp = await SGDB.searchGame(game.name);
-                id = gameResp[0].id;
-            }
-
-            await queryApi(type, id);
-        };
-
         void fetchImages();
     }, [game]);
+
+    useEffect(() => {
+        void fetchImages();
+    }, [style]);
+
+    const fetchImages = async (): Promise<void> => {
+        let id = game?.platform ? game.gameId : game.appid;
+        let type = game.platform ?? "steam";
+
+        if (game?.platform === "other") {
+            type = "game";
+
+            const gameResp = await SGDB.searchGame(game.name);
+            id = gameResp[0].id;
+        }
+
+        await queryApi(type, id);
+    };
 
     const onClick = (item, itemIndex):void => {
         const clonedItems = [...items];
@@ -73,11 +88,13 @@ const Search = ():ReactElement => {
     const queryApi = async (type, id): Promise<void> => {
         let response;
 
+        const types = style === ANY_STYLE ? ["static", "animated"] : [style.toLowerCase()];
+
         switch (assetType) {
             case "horizontalGrid":
                 response = await SGDB.getGrids({
                     dimensions: ["460x215", "920x430"],
-                    types: ["static", "animated"],
+                    types,
                     type,
                     id
                 });
@@ -86,18 +103,18 @@ const Search = ():ReactElement => {
             case "verticalGrid":
                 response = await SGDB.getGrids({
                     dimensions: ["600x900"],
-                    types: ["static", "animated"],
+                    types,
                     type,
                     id
                 });
                 break;
 
             case "hero":
-                response = await SGDB.getHeroes({type, id, types: ["static", "animated"]});
+                response = await SGDB.getHeroes({type, id, types});
                 break;
 
             case "logo":
-                response = await SGDB.getLogos({type, id, types: ["static", "animated"]});
+                response = await SGDB.getLogos({type, id, types});
                 break;
 
             default:
@@ -142,7 +159,25 @@ const Search = ():ReactElement => {
 
     return (
         <>
-            <TopBlur />
+            <TopBlur additionalHeight={48} />
+            <div
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    position: "fixed",
+                    top: 30,
+                    width: "calc(100vw - 55px)",
+                    height: 48,
+                    zIndex: 2,
+                }}
+            >
+                <DropDownMenu
+                    defaultValue={ANY_STYLE}
+                    values={styles}
+                    onChangeValue={setStyle}
+                    style={{width:"120px"}}
+                />
+            </div>
             <div
                 id="search-container"
                 style={{
@@ -150,7 +185,7 @@ const Search = ():ReactElement => {
                     overflow: "auto",
                     padding: 15,
                     paddingLeft: 10,
-                    paddingTop: 45,
+                    paddingTop: 84,
                 }}
             >
                 {items.map((item, i) => (
