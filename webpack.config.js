@@ -1,6 +1,10 @@
-const path = require("path");
+// const path = require("path");
 
-module.exports = {
+import * as path from "path";
+import * as url from "url";
+const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
+
+export default {
     entry: "./app/index.tsx",
     mode: "development",
     devtool: "source-map",
@@ -47,6 +51,7 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, "public/"),
+        // path: "public",
         publicPath: "/public/",
         filename: "bundle.js",
     },

@@ -5,6 +5,7 @@
   "main": "main.js",
   "author": "SteamGridDB.com",
   "license": "MIT",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/steamgriddb/steamgriddb-manager.git"
