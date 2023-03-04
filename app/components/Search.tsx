@@ -10,14 +10,13 @@ import addAsset from "../utils/addAsset";
 import getGame from "../utils/getGame";
 import {Game} from "../types";
 import {DropDownMenu} from "react-uwp";
-
-const SteamGridDB = window.require("steamgriddb");
+import SteamGridDB from "steamgriddb";
 
 const ANY_STYLE = "Any Style";
 
 const Search = ():ReactElement => {
     const {appid, assetType} = useParams();
-    const SGDB = new SteamGridDB("b971a6f5f280490ab62c0ee7d0fd1d16");
+    const SGDB = new SteamGridDB({key: "b971a6f5f280490ab62c0ee7d0fd1d16"});
 
     const [game, setGame] = useState<Game>();
     const [items, setItems] = useState([]);
@@ -149,7 +148,7 @@ const Search = ():ReactElement => {
                 <Image
                     style={{
                         width: "100%",
-                        height: "auto",
+                        height: "auto"
                     }}
                     src={src}
                 />
@@ -168,7 +167,7 @@ const Search = ():ReactElement => {
                     top: 30,
                     width: "calc(100vw - 55px)",
                     height: 48,
-                    zIndex: 2,
+                    zIndex: 2
                 }}
             >
                 <DropDownMenu
@@ -185,7 +184,7 @@ const Search = ():ReactElement => {
                     overflow: "auto",
                     padding: 15,
                     paddingLeft: 10,
-                    paddingTop: 84,
+                    paddingTop: 84
                 }}
             >
                 {items.map((item, i) => (
