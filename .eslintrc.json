@@ -41,7 +41,8 @@
         "array-bracket-spacing": ["error", "never"],
         "object-curly-spacing": ["error", "never"],
         "brace-style": ["error", "1tbs"],
-        "comma-dangle": ["error", "never"]
+        "comma-dangle": ["error", "never"],
+        "no-else-return": "error"
     },
     "overrides": [
         {

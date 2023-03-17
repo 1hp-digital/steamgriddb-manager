@@ -9,18 +9,19 @@ import {getTheme} from "react-uwp/Theme";
 import addAsset from "../utils/addAsset";
 import getGame from "../utils/getGame";
 import {Game} from "../types";
-import {DropDownMenu} from "react-uwp";
-import SteamGridDB from "steamgriddb";
+import {CheckBox, DropDownMenu} from "react-uwp";
+
+import steamgriddb from "steamgriddb";
 
 const ANY_STYLE = "Any Style";
 
 const Search = ():ReactElement => {
     const {appid, assetType} = useParams();
-    const SGDB = new SteamGridDB({key: "b971a6f5f280490ab62c0ee7d0fd1d16"});
+    const SGDB = new steamgriddb({key: "b971a6f5f280490ab62c0ee7d0fd1d16"});
 
     const [game, setGame] = useState<Game>();
     const [items, setItems] = useState([]);
-    const [style, setStyle] = useState(ANY_STYLE);
+    const [useStyle, setUseStyle] = useState(ANY_STYLE);
     const [useStatic, setUseStatic] = useState(true);
     const [useAnimated, setUseAnimated] = useState(true);
     const [useHumor, setUseHumor] = useState(true);
@@ -28,14 +29,19 @@ const Search = ():ReactElement => {
     const [useEpilepsy, setUseEpilepsy] = useState(true);
     const [useUntagged, setUseUntagged] = useState(true);
     const [redirect, setRedirect] = useState<ReactElement|null>(null);
-    const [isLoaded, setIsLoaded] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+    const [page, setPage] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
 
     const theme = getTheme();
 
-    const styles = [ANY_STYLE, "Static", "Animated"];
+    // @todo no_logo and white_logo are not working with the API
+    const allStyles = [ANY_STYLE, "Alternate", "Blurred", "Material"];
 
     useEffect(() => {
         PubSub.publish("showBack", true);
+
+        setIsLoading(true);
 
         const fetchGame = async ():Promise<void> => {
             const game = await getGame(parseInt(appid));
@@ -46,18 +52,33 @@ const Search = ():ReactElement => {
     }, []);
 
     useEffect(() => {
-        if (!game) {
+        if (!useHumor && !useAdultContent && !useEpilepsy && !useUntagged) {
+            setUseUntagged(true);
             return;
         }
 
-        void fetchImages();
-    }, [game]);
+        if (!useStatic && !useAnimated) {
+            setUseStatic(true);
+            return;
+        }
+
+        setHasMore(true);
+        setPage(0);
+
+        if (page === 0) {
+            void fetchImages();
+        }
+    }, [useStyle, useStatic, useAnimated, useHumor, useAdultContent, useEpilepsy, useUntagged]);
 
     useEffect(() => {
         void fetchImages();
-    }, [style]);
+    }, [game, page]);
 
     const fetchImages = async (): Promise<void> => {
+        if (!game || !hasMore) {
+            return;
+        }
+
         let id = game?.platform ? game.gameId : game.appid;
         let type = game.platform ?? "steam";
 
@@ -68,7 +89,14 @@ const Search = ():ReactElement => {
             id = gameResp[0].id;
         }
 
-        await queryApi(type, id);
+        await queryApi(type, id, page);
+    };
+
+    const onScroll = (event): void => {
+        if (event.target.scrollHeight - event.target.scrollTop === event.target.clientHeight) {
+            console.log("bottom");
+            setPage(page + 1);
+        }
     };
 
     const onClick = (item, itemIndex):void => {
@@ -84,47 +112,77 @@ const Search = ():ReactElement => {
         });
     };
 
-    const queryApi = async (type, id): Promise<void> => {
+    const queryApi = async (type, id, page = 0): Promise<void> => {
         let response;
 
-        const types = style === ANY_STYLE ? ["static", "animated"] : [style.toLowerCase()];
+        const types = [];
+        useStatic && types.push("static");
+        useAnimated && types.push("animated");
+
+        const styles = (useStyle === ANY_STYLE)
+            ? allStyles.splice(1)
+                .map((style) => style.toLowerCase().replace(/ /g, "_"))
+            : [useStyle.toLowerCase().replace(/ /g, "_")];
+
+        const selectedTags = [];
+        if (!useUntagged) {
+            useHumor && selectedTags.push("humor");
+            useAdultContent && selectedTags.push("nsfw");
+            useEpilepsy && selectedTags.push("epilepsy");
+        }
+        const oneoftag = selectedTags.join(",");
+
+        const options = {
+            type,
+            id,
+            types,
+            styles,
+            nsfw: useAdultContent ? "any" : "false",
+            humor: useHumor ? "any" : "false",
+            epilepsy: useEpilepsy ? "any" : "false",
+            oneoftag,
+            page
+        };
 
         switch (assetType) {
             case "horizontalGrid":
-                response = await SGDB.getGrids({
-                    dimensions: ["460x215", "920x430"],
-                    types,
-                    type,
-                    id
-                });
+                response = await SGDB.getGrids({dimensions: ["460x215", "920x430"], ...options});
                 break;
 
             case "verticalGrid":
-                response = await SGDB.getGrids({
-                    dimensions: ["600x900"],
-                    types,
-                    type,
-                    id
-                });
+
+                response = await SGDB.getGrids({dimensions: ["600x900"], ...options});
                 break;
 
             case "hero":
-                response = await SGDB.getHeroes({type, id, types});
+                response = await SGDB.getHeroes(options);
                 break;
 
             case "logo":
-                response = await SGDB.getLogos({type, id, types});
+                response = await SGDB.getLogos(options);
                 break;
 
             default:
                 return;
         }
 
-        setIsLoaded(true);
-        setItems(response);
+        console.log("SGDB RESPONSE", response);
+
+        if (!response.length) {
+            setHasMore(false);
+        }
+
+        setIsLoading(false);
+
+
+        if (page == 0) {
+            setItems(response);
+        } else {
+            setItems([...items, ...response]);
+        }
     };
 
-    if (!isLoaded) {
+    if (isLoading) {
         return <Spinner />;
     }
 
@@ -133,6 +191,7 @@ const Search = ():ReactElement => {
     }
 
     const getThumbnailElement = (src):JSX.Element => {
+        if (!src) return;
         if (src.endsWith(".webm")) {
             return (
                 <video
@@ -143,21 +202,24 @@ const Search = ():ReactElement => {
                     style={{width: "100%", height: "auto"}}
                 />
             );
-        } else {
-            return (
-                <Image
-                    style={{
-                        width: "100%",
-                        height: "auto"
-                    }}
-                    src={src}
-                />
-            );
         }
-    };
+        return (
+            <Image
+                style={{
+                    width: "200px",
+                    height: "auto"
+                }}
+                src={src}
+            />
+        );
 
+    };
+console.log("items", items);
     return (
-        <>
+        <div style={{
+            "overflow": "scroll",
+            "height": "100%"
+        }}>
             <TopBlur additionalHeight={48} />
             <div
                 style={{
@@ -172,10 +234,46 @@ const Search = ():ReactElement => {
             >
                 <DropDownMenu
                     defaultValue={ANY_STYLE}
-                    values={styles}
-                    onChangeValue={setStyle}
+                    values={allStyles}
+                    onChangeValue={setUseStyle}
                     style={{width:"120px"}}
                 />
+                <div>
+                    <label>Types</label>
+                    <CheckBox
+                        defaultChecked={useStatic}
+                        onCheck={setUseStatic}
+                    />
+                    Static
+                    <CheckBox
+                        defaultChecked={useAnimated}
+                        onCheck={setUseAnimated}
+                    />
+                    Animated
+                </div>
+                <div>
+                    <label>Tags</label>
+                    <CheckBox
+                        defaultChecked={useHumor}
+                        onCheck={setUseHumor}
+                    />
+                    Humor
+                    <CheckBox
+                        defaultChecked={useAdultContent}
+                        onCheck={setUseAdultContent}
+                    />
+                    Adult Content
+                    <CheckBox
+                        defaultChecked={useEpilepsy}
+                        onCheck={setUseEpilepsy}
+                    />
+                    Epilepsy
+                    <CheckBox
+                        defaultChecked={useUntagged}
+                        onCheck={setUseUntagged}
+                    />
+                    Untagged
+                </div>
             </div>
             <div
                 id="search-container"
@@ -186,6 +284,7 @@ const Search = ():ReactElement => {
                     paddingLeft: 10,
                     paddingTop: 84
                 }}
+                onScroll={onScroll}
             >
                 {items.map((item, i) => (
                     <Button
@@ -201,6 +300,11 @@ const Search = ():ReactElement => {
                         ) : (
                             <>{getThumbnailElement(item.thumb)}</>
                         )}
+                        <p>
+                            nwfw: {item.nsfw?.toString()}<br/>
+                            humor: {item.humor?.toString()}<br/>
+                            untagged: {item.untagged?.toString()}<br/>
+                        </p>
                         <p style={{...theme.typographyStyles.captionAlt, padding: 5}}>
                             <Image style={{height: 20, marginRight: 5}} src={item.author.avatar} />
                             {item.author.name}
@@ -208,7 +312,7 @@ const Search = ():ReactElement => {
                     </Button>
                 ))}
             </div>
-        </>
+        </div>
     );
 };
 
