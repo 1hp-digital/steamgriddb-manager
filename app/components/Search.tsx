@@ -35,8 +35,7 @@ const Search = ():ReactElement => {
 
     const theme = getTheme();
 
-    // @todo no_logo and white_logo are not working with the API
-    const allStyles = [ANY_STYLE, "Alternate", "Blurred", "Material"];
+    const allStyles = [ANY_STYLE, "Alternate", "Blurred", "Material", "No Logo", "White Logo"];
 
     useEffect(() => {
         PubSub.publish("showBack", true);
@@ -191,7 +190,9 @@ const Search = ():ReactElement => {
     }
 
     const getThumbnailElement = (src):JSX.Element => {
-        if (!src) return;
+        if (!src) {
+            return;
+        }
         if (src.endsWith(".webm")) {
             return (
                 <video
@@ -214,7 +215,7 @@ const Search = ():ReactElement => {
         );
 
     };
-console.log("items", items);
+    console.log("items", items);
     return (
         <div style={{
             "overflow": "scroll",
@@ -238,41 +239,55 @@ console.log("items", items);
                     onChangeValue={setUseStyle}
                     style={{width:"120px"}}
                 />
-                <div>
-                    <label>Types</label>
-                    <CheckBox
-                        defaultChecked={useStatic}
-                        onCheck={setUseStatic}
-                    />
-                    Static
-                    <CheckBox
-                        defaultChecked={useAnimated}
-                        onCheck={setUseAnimated}
-                    />
-                    Animated
-                </div>
-                <div>
-                    <label>Tags</label>
-                    <CheckBox
-                        defaultChecked={useHumor}
-                        onCheck={setUseHumor}
-                    />
-                    Humor
-                    <CheckBox
-                        defaultChecked={useAdultContent}
-                        onCheck={setUseAdultContent}
-                    />
-                    Adult Content
-                    <CheckBox
-                        defaultChecked={useEpilepsy}
-                        onCheck={setUseEpilepsy}
-                    />
-                    Epilepsy
-                    <CheckBox
-                        defaultChecked={useUntagged}
-                        onCheck={setUseUntagged}
-                    />
-                    Untagged
+                <div className="searchOptions">
+                    <div>
+                        <span>Types</span>
+                        <label>
+                            <CheckBox
+                                defaultChecked={useStatic}
+                                onCheck={setUseStatic}
+                            />
+                            <span>Static</span>
+                        </label>
+                        <label>
+                            <CheckBox
+                                defaultChecked={useAnimated}
+                                onCheck={setUseAnimated}
+                            />
+                            <span>Animated</span>
+                        </label>
+                    </div>
+                    <div>
+                        <span>Tags</span>
+                        <label>
+                            <CheckBox
+                                defaultChecked={useHumor}
+                                onCheck={setUseHumor}
+                            />
+                            <span>Humor</span>
+                        </label>
+                        <label>
+                            <CheckBox
+                                defaultChecked={useAdultContent}
+                                onCheck={setUseAdultContent}
+                            />
+                            <span>Adult Content</span>
+                        </label>
+                        <label>
+                            <CheckBox
+                                defaultChecked={useEpilepsy}
+                                onCheck={setUseEpilepsy}
+                            />
+                            <span>Epilepsy</span>
+                        </label>
+                        <label>
+                            <CheckBox
+                                defaultChecked={useUntagged}
+                                onCheck={setUseUntagged}
+                            />
+                            <span>Untagged</span>
+                        </label>
+                    </div>
                 </div>
             </div>
             <div
@@ -300,11 +315,6 @@ console.log("items", items);
                         ) : (
                             <>{getThumbnailElement(item.thumb)}</>
                         )}
-                        <p>
-                            nwfw: {item.nsfw?.toString()}<br/>
-                            humor: {item.humor?.toString()}<br/>
-                            untagged: {item.untagged?.toString()}<br/>
-                        </p>
                         <p style={{...theme.typographyStyles.captionAlt, padding: 5}}>
                             <Image style={{height: 20, marginRight: 5}} src={item.author.avatar} />
                             {item.author.name}

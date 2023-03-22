@@ -99,3 +99,30 @@ div[class^="fluent-background-"] {
 
 .grow { transition: all .2s ease-in-out; }
 .grow:hover { transform: scale(1.1); }
+
+.searchOptions {
+    text-align: right;
+    width: 100%;
+}
+
+.searchOptions > div {
+    display: inline-block;
+}
+
+.searchOptions > div:first-child {
+    border-right: 2px solid rgba(255, 255, 255, 0.2);
+    margin-right: 10px;
+}
+
+.searchOptions > div > span {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.searchOptions label > div {
+    margin: 5px 5px 5px 0;
+}
+
+.searchOptions label > span {
+    margin-right: 10px;
+}
