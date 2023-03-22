@@ -11,7 +11,8 @@ import getGame from "../utils/getGame";
 import {Game} from "../types";
 import {CheckBox, DropDownMenu} from "react-uwp";
 
-import steamgriddb from "steamgriddb";
+import steamgriddb, {SGDBImageOptions} from "steamgriddb";
+import Thumbnail from "./Thumbnail";
 
 const ANY_STYLE = "Any Style";
 
@@ -28,14 +29,27 @@ const Search = ():ReactElement => {
     const [useAdultContent, setUseAdultContent] = useState(false);
     const [useEpilepsy, setUseEpilepsy] = useState(true);
     const [useUntagged, setUseUntagged] = useState(true);
-    const [redirect, setRedirect] = useState<ReactElement|null>(null);
+    const [redirect, setRedirect] = useState<ReactElement | null>(null);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
 
     const theme = getTheme();
 
-    const allStyles = [ANY_STYLE, "Alternate", "Blurred", "Material", "No Logo", "White Logo"];
+    const allStyles = [ANY_STYLE];
+
+    switch (assetType) {
+        case "horizontalGrid":
+        case "verticalGrid":
+            allStyles.push(...["Alternate", "Blurred", "Material", "White Logo", "No Logo"]);
+            break;
+        case "hero":
+            allStyles.push(...["Alternate", "Blurred", "Material"]);
+            break;
+        case "logo":
+            allStyles.push(...["Official", "White", "Black", "Custom"]);
+            break;
+    }
 
     useEffect(() => {
         PubSub.publish("showBack", true);
@@ -70,7 +84,7 @@ const Search = ():ReactElement => {
     }, [useStyle, useStatic, useAnimated, useHumor, useAdultContent, useEpilepsy, useUntagged]);
 
     useEffect(() => {
-        void fetchImages();
+        void queryApi(0);
     }, [game, page]);
 
     const fetchImages = async (): Promise<void> => {
@@ -78,17 +92,7 @@ const Search = ():ReactElement => {
             return;
         }
 
-        let id = game?.platform ? game.gameId : game.appid;
-        let type = game.platform ?? "steam";
-
-        if (game?.platform === "other") {
-            type = "game";
-
-            const gameResp = await SGDB.searchGame(game.name);
-            id = gameResp[0].id;
-        }
-
-        await queryApi(type, id, page);
+        await queryApi(page);
     };
 
     const onScroll = (event): void => {
@@ -111,8 +115,18 @@ const Search = ():ReactElement => {
         });
     };
 
-    const queryApi = async (type, id, page = 0): Promise<void> => {
+    const queryApi = async (page = 0): Promise<void> => {
         let response;
+
+        let id = game?.platform ? parseInt(game.gameId) : game.appid;
+        let type = game.platform ?? "steam";
+
+        if (game?.platform === "other") {
+            type = "game";
+
+            const gameResp = await SGDB.searchGame(game.name);
+            id = gameResp[0].id;
+        }
 
         const types = [];
         useStatic && types.push("static");
@@ -131,7 +145,7 @@ const Search = ():ReactElement => {
         }
         const oneoftag = selectedTags.join(",");
 
-        const options = {
+        const options:SGDBImageOptions = {
             type,
             id,
             types,
@@ -149,7 +163,6 @@ const Search = ():ReactElement => {
                 break;
 
             case "verticalGrid":
-
                 response = await SGDB.getGrids({dimensions: ["600x900"], ...options});
                 break;
 
@@ -189,33 +202,8 @@ const Search = ():ReactElement => {
         return redirect;
     }
 
-    const getThumbnailElement = (src):JSX.Element => {
-        if (!src) {
-            return;
-        }
-        if (src.endsWith(".webm")) {
-            return (
-                <video
-                    src={src}
-                    autoPlay
-                    playsInline
-                    loop
-                    style={{width: "100%", height: "auto"}}
-                />
-            );
-        }
-        return (
-            <Image
-                style={{
-                    width: "200px",
-                    height: "auto"
-                }}
-                src={src}
-            />
-        );
-
-    };
     console.log("items", items);
+
     return (
         <div style={{
             "overflow": "scroll",
@@ -307,20 +295,19 @@ const Search = ():ReactElement => {
                         style={{padding: 0, margin: 5}}
                         onClick={():void => onClick(item, i)}
                     >
-                        {item.downloading ? (
-                            <div style={{position: "relative"}}>
-                                <Spinner size={70} style={{position: "absolute", background: "rgba(0,0,0,.5)"}} />
-                                {getThumbnailElement(item.thumb)}
-                            </div>
-                        ) : (
-                            <>{getThumbnailElement(item.thumb)}</>
-                        )}
+                        <Thumbnail item={item} type={assetType} scale={1} isLoading={item.downloading} />
                         <p style={{...theme.typographyStyles.captionAlt, padding: 5}}>
-                            <Image style={{height: 20, marginRight: 5}} src={item.author.avatar} />
+                            <Image style={{height: 15, marginRight: 5}} src={item.author.avatar} />
                             {item.author.name}
                         </p>
                     </Button>
                 ))}
+
+                {items.length === 0 && (
+                    <div style={{textAlign: "center", marginTop: 50}}>
+                        No assets found.
+                    </div>
+                )}
             </div>
         </div>
     );

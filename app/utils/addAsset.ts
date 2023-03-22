@@ -9,24 +9,31 @@ const glob = window.require("glob");
 const addAsset = async (type, appId, url):Promise<void> => {
     const userGridPath = await getCurrentUserGridPath();
 
+    console.log("adding asset", type, appId, url);
+
     return new Promise<void>((resolve, reject) => {
         const imageUrl = url;
-        const imageExt = extname(imageUrl);
+
+        let imageExtension = extname(imageUrl);
+
+        if (imageExtension === ".webp") {
+            imageExtension = ".png";
+        }
 
         let dest;
 
         switch (type) {
             case "horizontalGrid":
-                dest = join(userGridPath, `${appId}${imageExt}`);
+                dest = join(userGridPath, `${appId}${imageExtension}`);
                 break;
             case "verticalGrid":
-                dest = join(userGridPath, `${appId}p${imageExt}`);
+                dest = join(userGridPath, `${appId}p${imageExtension}`);
                 break;
             case "hero":
-                dest = join(userGridPath, `${appId}_hero${imageExt}`);
+                dest = join(userGridPath, `${appId}_hero${imageExtension}`);
                 break;
             case "logo":
-                dest = join(userGridPath, `${appId}_logo${imageExt}`);
+                dest = join(userGridPath, `${appId}_logo${imageExtension}`);
                 break;
             default:
                 reject();
@@ -50,7 +57,7 @@ const addAsset = async (type, appId, url):Promise<void> => {
 
             response.on("end", () => {
                 // Delete old image(s)
-                glob(`${dest.replace(imageExt, "")}.*`, (er, files) => {
+                glob(`${dest.replace(imageExtension, "")}.*`, (er, files) => {
                     files.forEach((file) => {
                         fs.unlinkSync(file);
                     });
