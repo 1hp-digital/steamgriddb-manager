@@ -79,26 +79,26 @@ const Search = ():ReactElement => {
         setPage(0);
 
         if (page === 0) {
-            void fetchImages();
+            void queryApi(0);
         }
     }, [useStyle, useStatic, useAnimated, useHumor, useAdultContent, useEpilepsy, useUntagged]);
 
     useEffect(() => {
         void queryApi(0);
-    }, [game, page]);
+    }, [game]);
 
-    const fetchImages = async (): Promise<void> => {
-        if (!game || !hasMore) {
-            return;
-        }
-
-        await queryApi(page);
-    };
+    useEffect(() => {
+        console.log("page changed to ", page);
+        void queryApi(page);
+    }, [page]);
 
     const onScroll = (event): void => {
         if (event.target.scrollHeight - event.target.scrollTop === event.target.clientHeight) {
-            console.log("bottom");
-            setPage(page + 1);
+            console.log("hit bottom");
+            if (hasMore) {
+                console.log("setting page to ", page + 1);
+                setPage(page + 1);
+            }
         }
     };
 
@@ -116,6 +116,10 @@ const Search = ():ReactElement => {
     };
 
     const queryApi = async (page = 0): Promise<void> => {
+        if (!game) {
+            return;
+        }
+
         let response;
 
         let id = game?.platform ? parseInt(game.gameId) : game.appid;
