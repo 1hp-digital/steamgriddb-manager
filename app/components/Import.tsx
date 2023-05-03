@@ -41,11 +41,10 @@ const Import = ():ReactElement => {
         log.info("Opened Import Page");
 
         void updateSteamIsRunning();
-        checkSteamInterval = setInterval(updateSteamIsRunning, 2000);
+        checkSteamInterval = setInterval(updateSteamIsRunning, 1000);
 
         void getInstalledPlatforms();
 
-        // returned function will be called on component unmount
         return () => {
             clearInterval(checkSteamInterval);
         };
@@ -169,17 +168,17 @@ const Import = ():ReactElement => {
    *   so different pages can display their own message if Steam is running.
    */
     const updateSteamIsRunning = async ():Promise<void> => {
-        const steamIsRunning = await checkIfSteamIsRunning();
+        const steamIsRunningCheck = await checkIfSteamIsRunning();
 
-        console.log("steamIsRunning", steamIsRunning);
+        console.log("steamIsRunning", steamIsRunningCheck);
 
-        if (steamIsRunning !== steamIsRunning) {
-            log.info(`Steam is ${steamIsRunning ? "open" : "closed"}`);
+        if (steamIsRunningCheck !== steamIsRunning) {
+            log.info(`Steam is ${steamIsRunningCheck ? "open" : "closed"}`);
 
-            setSteamIsRunning(steamIsRunning);
+            setSteamIsRunning(steamIsRunningCheck);
 
             // Update non-Steam games in case changes were made while Steam was open
-            if (!steamIsRunning) {
+            if (!steamIsRunningCheck) {
                 setTimeout(() => {
                     getInstalledPlatforms();
                 }, 0);
@@ -368,6 +367,8 @@ const Import = ():ReactElement => {
     if (!isLoaded) {
         return (<Spinner text={loadingText} />);
     }
+
+    console.log("About to render. steamIsRunning: ", steamIsRunning);
 
     return (
         <>

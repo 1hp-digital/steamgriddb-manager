@@ -23,14 +23,32 @@ const getNonSteamGames = async ():Promise<Game[]> => {
                     (item.appid >>> 0) : // bitwise unsigned 32 bit ID of manually added non-steam game
                     generateNewAppId(exe, appName);
 
+                // if (store.has(`games.${configId}`)) {
+                //     const storedGame = store.get(`games.${configId}`);
+                //     if (typeof games[storedGame.platform] === 'undefined') {
+                //         games[storedGame.platform] = [];
+                //     }
+                //
+                //     if (!processed.includes(configId)) {
+                //         games[storedGame.platform].push({
+                //             gameId: storedGame.id,
+                //             name: appName,
+                //             platform: storedGame.platform,
+                //             type: 'shortcut',
+                //             appid,
+                //         });
+                //         processed.push(configId);
+                //     }
+                // } else {
                 games.push({
                     gameId: null,
                     name: appName,
                     platform: "other",
                     type: "shortcut",
                     tags: item.tags,
-                    appid,
+                    appid
                 });
+                // }
             });
             return resolve(games);
         });
