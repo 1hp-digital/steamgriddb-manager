@@ -14,7 +14,7 @@ import getSteamGames from "../utils/getSteamGames";
 import getNonSteamGames from "../utils/getNonSteamGames";
 import {Game} from "../types";
 import GameListItem from "./GameListItem";
-import {DropDownMenu} from "react-uwp";
+import {Dropdown, Option} from "@fluentui/react-components";
 
 const log = window.require("electron-log");
 
@@ -90,7 +90,7 @@ const GamesList = ():ReactElement => {
         }
 
         const fuse = new Fuse(items, {
-            keys: ["name"],
+            keys: ["name"]
         });
         const result = fuse.search(searchTerm);
         const searchedGames = result.map((item) => item.item);
@@ -99,7 +99,8 @@ const GamesList = ():ReactElement => {
         forceCheck(); // Recheck lazyload
     };
 
-    const filterGames = (tagToFilter):void => {
+    const filterGames = (event, data):void => {
+        const tagToFilter = data.optionValue;
         if (tagToFilter === ALL_GAMES) {
             setDisplayedGames(fetchedGames);
             return;
@@ -135,14 +136,23 @@ const GamesList = ():ReactElement => {
                     top: 30,
                     width: "calc(100vw - 55px)",
                     height: 48,
-                    zIndex: 2,
+                    zIndex: 2
                 }}
             >
-                <DropDownMenu
+                <Dropdown
+                    defaultSelectedOptions={[ALL_GAMES]}
                     defaultValue={ALL_GAMES}
-                    values={tags}
-                    onChangeValue={filterGames}
-                />
+                    appearance="underline"
+                    onOptionSelect={filterGames}
+                    // options={tags}
+                    // onChangeValue={filterGames}
+                >
+                    {tags.map((option) => (
+                        <Option key={option} disabled={option === "Ferret"}>
+                            {option}
+                        </Option>
+                    ))}
+                </Dropdown>
                 <AutoSuggestBox style={{marginLeft: "auto", marginRight: 24}} placeholder="Search" onChangeValue={searchInput} />
                 <AppBarSeparator style={{height: 24}} />
                 <AppBarButton

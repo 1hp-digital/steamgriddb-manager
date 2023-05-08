@@ -4,6 +4,7 @@ import {HashRouter} from "react-router-dom";
 import ToastHandler from "./components/ToastHandler";
 import {ReactElement} from "react";
 import Window from "./Window";
+import {FluentProvider, teamsDarkTheme} from "@fluentui/react-components";
 
 import "./styles/App.css";
 
@@ -19,19 +20,21 @@ const App = ():ReactElement => {
     const accentColor = remote.systemPreferences.getAccentColor();
 
     return (
-        <UWPThemeProvider
-            theme={getTheme({
-                themeName: "dark",
-                accent: `#${accentColor}`,
-                useFluentDesign: true
-            })}
-        >
-            <HashRouter>
-                <Window />
-            </HashRouter>
+        <FluentProvider theme={teamsDarkTheme}>
+            <UWPThemeProvider
+                theme={getTheme({
+                    themeName: "dark",
+                    accent: `#${accentColor}`,
+                    useFluentDesign: true
+                })}
+            >
+                <HashRouter>
+                    <Window />
+                </HashRouter>
 
-            <ToastHandler />
-        </UWPThemeProvider>
+                <ToastHandler />
+            </UWPThemeProvider>
+        </FluentProvider>
     );
 
 };

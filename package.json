@@ -80,6 +80,7 @@
     "webpack-cli": "^5.0.1"
   },
   "dependencies": {
+    "@fluentui/react-components": "^9.19.1",
     "@node-steam/vdf": "^2.2.0",
     "chokidar": "^3.5.3",
     "crc": "^4.3.2",
